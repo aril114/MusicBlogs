@@ -1,7 +1,14 @@
+using MusicBlogs.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddSingleton<IArticleData, DapperArticleData>();
+builder.Services.AddSingleton<IDraftArticleData, DapperDraftArticleData>();
+builder.Services.AddSingleton<ICommentData, DapperCommentData>();
+builder.Services.AddSingleton<IUserData, DapperUserData>();
 
 var app = builder.Build();
 

@@ -1,14 +1,16 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Models;
+using MusicBlogs.Services;
 
 namespace MusicBlogs.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private DapperUserData userData;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, )
         {
             _logger = logger;
         }
