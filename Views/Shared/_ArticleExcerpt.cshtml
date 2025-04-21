@@ -1,0 +1,26 @@
+﻿@model Article
+<!-- Выжимка из статьи (пока что статья отображается целиком) -->
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <!-- Контейнер статьи -->
+            <div class="border rounded-3 p-4 bg-white mb-4">
+                <!-- Имя автора, дата публикации и рейтинг -->
+                <div class="text-muted small">
+                    <a style="text-decoration: none" asp-controller="User" asp-route-username="@Model.login_Users">Автор: @Model.login_Users</a> ·
+                    <span class="fw-light">@Model.published_at.ToString("f")</span> ·
+                    <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
+                    <a class="page-link" asp-controller="Article" asp-route-id="@Model.id">Перейти к статье</a>
+                </div>
+
+                <!-- Заголовок статьи -->
+                <h2 class="mb-3">@Model.title</h2>
+
+                <!-- Содержание статьи -->
+                <div class="lh-base">
+                    <p>@Model.content</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

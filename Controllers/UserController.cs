@@ -18,40 +18,48 @@ public class UserController : Controller
         _comments = commentData;
     }
 
-    [Route("/u/{login}")]
-    public IActionResult Index(string login)
+    [Route("/u/{username}")]
+    public IActionResult Index(string username)
     {
-        var model = _users.Get(login);
+        var model = _users.Get(username);
 
         if (model == null)
         {
             return NotFound();
         }
 
+        ViewBag.username = username;
+
         return View(model);
     }
 
-    [Route("/u/{login}/comments")]
-    public IActionResult Comments(string login)
+    [Route("/u/{username}/comments")]
+    public IActionResult Comments(string username)
     {
-        if (_users.Get(login) == null)
+        if (_users.Get(username) == null)
         {
             return NotFound();
         }
 
-        IEnumerable<Comment> model = _comments.GetAllForUser(login);
+        IEnumerable<Comment> model = _comments.GetAllForUser(username);
+
+        ViewBag.username = username;
+
         return View(model);
     }
 
-    [Route("/u/{login}/articles")]
-    public IActionResult Articles(string login)
+    [Route("/u/{username}/articles")]
+    public IActionResult Articles(string username)
     {
-        if (_users.Get(login) == null)
+        if (_users.Get(username) == null)
         {
             return NotFound();
         }
 
-        IEnumerable<Article> model = _articles.GetAllForUser(login);
+        IEnumerable<Article> model = _articles.GetAllForUser(username);
+
+        ViewBag.username = username;
+
         return View(model);
     }
 }

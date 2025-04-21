@@ -13,7 +13,7 @@
             <div class="border rounded-3 p-4 bg-white mb-4">
                 <!-- Имя автора, дата публикации и рейтинг -->
                 <div class="text-muted small">
-                    <a style="text-decoration: none" asp-controller="User" asp-route-login="@Model.author">Автор: @Model.author</a> ·
+                    <a style="text-decoration: none" asp-controller="User" asp-route-username="@Model.author">Автор: @Model.author</a> ·
                     <span class="fw-light">@Model.published_at.ToString("f")</span> ·
                     <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
                 </div>
