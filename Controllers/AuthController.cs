@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Models;
 using MusicBlogs.Services;
@@ -23,7 +22,7 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public IActionResult Login(string login, string password)
+    public async Task<IActionResult> Login(string login, string password)
     {
         User? user = _users.Get(login);
 
@@ -40,35 +39,28 @@ public class AuthController : Controller
         var claimsIdentity = new ClaimsIdentity(claims,
             CookieAuthenticationDefaults.AuthenticationScheme);
 
-        return SignIn(new ClaimsPrincipal(claimsIdentity),
-            CookieAuthenticationDefaults.AuthenticationScheme);
-
-        //return new ObjectResult(User);
-
-        //return RedirectToAction("Index", "Home");
-    }
-
-    [HttpPost]
-    public async Task<IActionResult> Register(string login, string password)
-    {
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.Name, login)
-        };
-
-        var claimsIdentity = new ClaimsIdentity(claims,
-            CookieAuthenticationDefaults.AuthenticationScheme);
-        
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,
             new ClaimsPrincipal(claimsIdentity));
 
         return RedirectToAction("Index", "Home");
     }
 
-    [Authorize]
-    public IActionResult Logout()
+    [HttpPost]
+    public IActionResult Register(string login, string password)
     {
-        SignOut(CookieAuthenticationDefaults.AuthenticationScheme);
+        if (string.IsNullOrEmpty(login) || string.IsNullOrEmpty(password))
+        {
+            return BadRequest();
+        }
+
+        _users.Add(login, password);
+
+        return Ok("Регистрация прошла успешно");
+    }
+
+    public async Task<IActionResult> Logout()
+    {
+        await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
         return RedirectToAction("Index", "Home");
     }
 }
