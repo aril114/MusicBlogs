@@ -12,7 +12,7 @@
             <!-- Контейнер статьи -->
             <div class="border rounded-3 p-4 bg-white mb-4">
                 <!-- Имя автора, дата публикации и рейтинг -->
-                <div class="text-muted small">
+                <div class="d-flex small text-muted align-items-center gap-2">
                     <a style="text-decoration: none" asp-controller="User" asp-route-username="@Model.author">Автор: @Model.author</a> ·
                     <span class="fw-light">@Model.published_at.ToString("f")</span> ·
                     <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
@@ -34,19 +34,19 @@
 <div class="border-top pt-4">
     <h5 class="mb-4 fw-normal">Комментарии</h5>
 
+    <div class="comments">
     @foreach (Comment comment in Model.comments)
     {
-        <div class="d-flex mb-4">
-            <div class="ms-3">
-                <div class="d-flex align-items-center mb-1">
-                    <span class="fw-semibold me-2">@comment.login_Users</span>
-                    <span class="text-muted small">@comment.published_at.ToString("g")</span>
-                </div>
-                <p class="mb-2">@comment.content</p>
-                <button class="btn btn-sm btn-outline-secondary py-0 px-2">Ответить</button>
+        <div class="mb-4 ms-4">
+            <div class="d-flex align-items-center mb-1 gap-2">
+                <span class="fw-semibold">@comment.login_Users</span>
+                <span class="text-muted small">@comment.published_at.ToString("g")</span>
             </div>
+            <p class="mb-2">@comment.content</p>
+            <button class="btn btn-sm btn-outline-secondary py-0 px-2">Ответить</button>
         </div>
     }
+    </div>
 
     <!-- Форма добавления комментария -->
     <form class="mt-5">

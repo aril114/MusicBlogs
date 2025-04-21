@@ -6,11 +6,11 @@
             <!-- Контейнер статьи -->
             <div class="border rounded-3 p-4 bg-white mb-4">
                 <!-- Имя автора, дата публикации и рейтинг -->
-                <div class="text-muted small">
-                    <a style="text-decoration: none" asp-controller="User" asp-route-username="@Model.login_Users">Автор: @Model.login_Users</a> ·
-                    <span class="fw-light">@Model.published_at.ToString("f")</span> ·
+                <div class="d-flex small text-muted align-items-center gap-2">
+                    <a style="text-decoration: none" asp-controller="User" asp-route-username="@Model.login_Users">Автор: @Model.login_Users</a>
+                    <span class="fw-light">@Model.published_at.ToString("f")</span>
                     <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
-                    <a class="page-link" asp-controller="Article" asp-route-id="@Model.id">Перейти к статье</a>
+                    <a class="page-link" asp-controller="Article" asp-action="Index" asp-route-id="@Model.id">Перейти к статье</a>
                 </div>
 
                 <!-- Заголовок статьи -->

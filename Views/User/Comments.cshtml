@@ -22,15 +22,16 @@
     </div>
 </nav>
 
+<div class="comments">
 @foreach(Comment comment in Model)
 {
-    <div class="d-flex mb-4">
-        <div class="ms-3">
-            <div class="d-flex align-items-center mb-1">
-                <span class="fw-semibold me-2">@comment.login_Users</span>
-                <span class="text-muted small">@comment.published_at.ToString("g")</span>
-            </div>
-            <p class="mb-2">@comment.content</p>
+    <div class="mb-4 ms-4">
+        <div class="d-flex align-items-center mb-1 gap-2">
+            <span class="fw-semibold">@comment.login_Users</span>
+            <span class="text-muted small">@comment.published_at.ToString("g")</span>
+            <a class="page-link" asp-controller="Article" asp-action="Index" asp-route-id="@comment.id_Articles">Перейти к статье</a>
         </div>
+        <p class="mb-2">@comment.content</p>
     </div>
 }
+</div>
