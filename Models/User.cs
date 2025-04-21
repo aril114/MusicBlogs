@@ -5,11 +5,11 @@ namespace MusicBlogs.Models;
 /// <summary>
 /// Зарегистрированный пользователь
 /// </summary>
-/// <param name="Login">Логин</param>
-/// <param name="CreatedAt">Дата и время создания</param>
-/// <param name="Contacts">Контакты</param>
-/// <param name="About">Текст о себе</param>
-/// <param name="Password">Пароль</param>
-/// <param name="IsModerator">Является ли модератором</param>
-public record User(string Login, DateTime CreatedAt, string Contacts,
-    string About, string Password, bool IsModerator);
+/// <param name="login">Логин</param>
+/// <param name="created_at">Дата и время создания</param>
+/// <param name="contacts">Контакты</param>
+/// <param name="about">Текст о себе</param>
+/// <param name="password">Пароль</param>
+/// <param name="is_moderator">Является ли модератором</param>
+public record User(string login, DateTime created_at, string contacts,
+    string about, string password, bool is_moderator);

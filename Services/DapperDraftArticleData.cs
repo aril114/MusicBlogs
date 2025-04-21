@@ -23,7 +23,7 @@ public class DapperDraftArticleData : IDraftArticleData
         {
             var sqlQuery = """
                 INSERT INTO "DraftArticles" (content, title, "login_Users") VALUES
-                (@Content, @Title, @UserLogin)
+                (@content, @title, @login_Users)
                 """;
             db.Execute(sqlQuery, newDraftArticle);
         }
@@ -33,7 +33,7 @@ public class DapperDraftArticleData : IDraftArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            var sqlQuery = "DELETE FROM \"DraftArticles\" WHERE id = @Id and \"login_Users\"=@UserLogin";
+            var sqlQuery = "DELETE FROM \"DraftArticles\" WHERE id = @id and \"login_Users\"=@login_Users";
             db.Execute(sqlQuery, DraftArticle);
         }
     }
@@ -44,7 +44,7 @@ public class DapperDraftArticleData : IDraftArticleData
         {
             return db.Query<DraftArticle>("""
                 SELECT * FROM "DraftArticles"
-                WHERE id = @id AND "login_Users"=@userLogin
+                WHERE id = @id AND "login_Users"=@login_Users
                 """, new { id, userLogin }).FirstOrDefault();
         }
     }
@@ -63,8 +63,8 @@ public class DapperDraftArticleData : IDraftArticleData
         {
             var sqlQuery = """
                 UPDATE "DraftArticles"
-                SET content = @Content, title = @Title
-                WHERE id = @Id AND "login_Users" = @UserLogin
+                SET content = @content, title = @title
+                WHERE id = @id AND "login_Users" = @login_Users
                 """;
             db.Execute(sqlQuery, DraftArticle);
         }

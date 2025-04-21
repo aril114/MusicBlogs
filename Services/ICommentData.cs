@@ -6,7 +6,9 @@ public interface ICommentData
 {
     void Add(Comment newComment);
     void Delete(Comment Comment);
-    Comment? Get(string id, string userLogin);
+    Comment? Get(int id, string userLogin);
     IEnumerable<Comment> GetAll();
+    IEnumerable<Comment> GetAllForArticle(int articleId);
+    IEnumerable<Comment> GetAllForUser(string userLogin);
     void Update(Comment Comment);
 }

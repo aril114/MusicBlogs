@@ -3,32 +3,36 @@ using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Models;
 using MusicBlogs.Services;
 
-namespace MusicBlogs.Controllers
+namespace MusicBlogs.Controllers;
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+    const string SessionLogin = "login";
+    const string SessionPassword = "password";
+
+    private readonly ILogger<HomeController> _logger;
+    private IArticleData _articles;
+
+    public HomeController(ILogger<HomeController> logger, IArticleData articleData)
     {
-        private readonly ILogger<HomeController> _logger;
-        private DapperUserData userData;
+        _logger = logger;
+        _articles = articleData;
+    }
 
-        public HomeController(ILogger<HomeController> logger, )
-        {
-            _logger = logger;
-        }
+    public IActionResult Index()
+    {
+        var model = _articles.GetAll();
+        return View(model);
+    }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
+    public IActionResult Privacy()
+    {
+        return View();
+    }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    public IActionResult Error()
+    {
+        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
     }
 }

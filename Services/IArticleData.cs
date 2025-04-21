@@ -8,5 +8,6 @@ public interface IArticleData
     void Delete(Article article);
     Article? Get(int id);
     IEnumerable<Article> GetAll();
+    IEnumerable<Article> GetAllForUser(string userLogin);
     void Update(Article article);
 }

@@ -23,7 +23,7 @@ public class DapperCommentData : ICommentData
         {
             var sqlQuery = """
                 INSERT INTO "Comments" (content, title, "login_Users") VALUES
-                (@Content, @Title, @UserLogin)
+                (@content, @title, @login_Users)
                 """;
             db.Execute(sqlQuery, newComment);
         }
@@ -33,19 +33,19 @@ public class DapperCommentData : ICommentData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            var sqlQuery = "DELETE FROM \"Comments\" WHERE id = @Id and \"id_Articles\"=@ArticleId";
+            var sqlQuery = "DELETE FROM \"Comments\" WHERE id = @id and \"id_Articles\"=@id_Articles";
             db.Execute(sqlQuery, Comment);
         }
     }
 
-    public Comment? Get(string id, string userLogin)
+    public Comment? Get(int id, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<Comment>("""
                 SELECT * FROM "Comments"
-                WHERE id = @id AND "login_Users"=@userLogin
-                """, new { id, userLogin }).FirstOrDefault();
+                WHERE id = @id AND "login_Users"=@login_Users
+                """, new { id, login_Users }).FirstOrDefault();
         }
     }
 
@@ -63,10 +63,38 @@ public class DapperCommentData : ICommentData
         {
             var sqlQuery = """
                 UPDATE "Comments"
-                SET content = @Content, title = @Title, "login_Users" = @UserLogin
-                WHERE id = @Id
+                SET content = @content, title = @title, "login_Users" = @login_Users
+                WHERE id = @id
                 """;
             db.Execute(sqlQuery, Comment);
+        }
+    }
+
+    public IEnumerable<Comment> GetAllForArticle(int articleId)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            string sqlQuery = """
+                SELECT * FROM "Comments"
+                WHERE "id_Articles" = @articleId
+                ORDER BY id
+                """;
+
+            return db.Query<Comment>(sqlQuery, new { articleId }).ToList();
+        }
+    }
+
+    public IEnumerable<Comment> GetAllForUser(string userLogin)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            string sqlQuery = """
+                SELECT * FROM "Comments"
+                WHERE "login_Users" = @userLogin
+                ORDER BY "published_at"
+                """;
+
+            return db.Query<Comment>(sqlQuery, new { userLogin }).ToList();
         }
     }
 }

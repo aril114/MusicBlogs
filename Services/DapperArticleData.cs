@@ -22,8 +22,8 @@ public class DapperArticleData : IArticleData
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO Articles (content, title, login_Users, rating) VALUES
-                (@Content, @Title, @UserLogin, @Rating)
+                INSERT INTO "Articles" (content, title, "login_Users", rating) VALUES
+                (@content, @title, @login_Users, @rating)
                 """;
             db.Execute(sqlQuery, newArticle);
         }
@@ -33,8 +33,8 @@ public class DapperArticleData : IArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            var sqlQuery = "DELETE FROM Articles where id = @Id";
-            db.Execute(sqlQuery, new { article.Id });
+            var sqlQuery = "DELETE FROM \"Articles\" where id = @id";
+            db.Execute(sqlQuery, new { article.id });
         }
     }
 
@@ -42,7 +42,7 @@ public class DapperArticleData : IArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            return db.Query<Article>("SELECT * FROM Articles WHERE id = @id", new { id })
+            return db.Query<Article>("SELECT * FROM \"Articles\" WHERE id = @id", new { id })
                 .FirstOrDefault();
         }
     }
@@ -51,7 +51,19 @@ public class DapperArticleData : IArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            return db.Query<Article>("SELECT * FROM Articles").ToList();
+            return db.Query<Article>("SELECT * FROM \"Articles\"").ToList();
+        }
+    }
+
+    public IEnumerable<Article> GetAllForUser(string userLogin)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            return db.Query<Article>("""
+                SELECT * FROM "Articles"
+                WHERE "login_Users" = @userLogin
+                """, new { userLogin }).ToList();
+                
         }
     }
 
@@ -60,9 +72,9 @@ public class DapperArticleData : IArticleData
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                UPDATE Articles SET content = @Content, title = @Title, 
-                login_Users = @UserLogin, rating = @Rating, published_at = @PublishedAt
-                WHERE id = @Id
+                UPDATE "Articles" SET content = @content, title = @title, 
+                "login_Users" = @login_Users, rating = @rating, published_at = @published_at
+                WHERE id = @id
                 """;
             db.Execute(sqlQuery, article);
         }

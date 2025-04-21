@@ -3,8 +3,8 @@
 /// <summary>
 /// 
 /// </summary>
-/// <param name="Id">ID, часть первичного ключа</param>
-/// <param name="Content">Текст</param>
-/// <param name="Title">Заголовок</param>
-/// <param name="UserLogin">Логин автора, часть первичного ключа</param>
-public record DraftArticle(int Id, string Content, string Title, string UserLogin);
+/// <param name="id">ID, часть первичного ключа</param>
+/// <param name="content">Текст</param>
+/// <param name="title">Заголовок</param>
+/// <param name="login_Users">Логин автора, часть первичного ключа</param>
+public record DraftArticle(int id, string content, string title, string login_Users);

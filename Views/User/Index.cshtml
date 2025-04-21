@@ -1,0 +1,49 @@
+﻿@model MusicBlogs.Models.User
+@{
+    ViewData["Title"] = $"Пользователь {Model.login}";
+}
+
+<nav class="navbar navbar-expand rounded">
+    <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample10" aria-controls="navbarsExample10" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" asp-action="Index">О пользователе</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Articles">Статьи</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="Comments">Комментарии</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<b>Имя пользователя:</b>
+<div>@Model.login</div>
+<b>Зарегистрирован:</b>
+<div>@Model.created_at.ToString("f")</div>
+@if (Model.about != null)
+{
+    <b>О себе:</b>
+    <div>@Model.about</div>
+}
+@if (Model.contacts != null)
+{
+    <b>Контакты:</b>
+    <div>@Model.contacts</div>
+}
+@if (Model.is_moderator)
+{
+    <b style="color: forestgreen">Модератор</b>
+}
+else
+{
+    <b>Обычный пользователь</b>
+}

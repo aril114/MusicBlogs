@@ -17,15 +17,15 @@ public class DapperUserData : IUserData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(User newUser)
+    public void Add(string login, string password)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "Users" (login, contacts, about, password) VALUES
-                (@Login, @Contacts, @About, @Password)
+                INSERT INTO "Users" (login, password) VALUES
+                (@login, @password)
                 """;
-            db.Execute(sqlQuery, newUser);
+            db.Execute(sqlQuery, new { login, password });
         }
     }
 
@@ -33,8 +33,8 @@ public class DapperUserData : IUserData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            var sqlQuery = "DELETE FROM \"Users\" where login = @Login";
-            db.Execute(sqlQuery, new { user.Login });
+            var sqlQuery = "DELETE FROM \"Users\" where login = @login";
+            db.Execute(sqlQuery, new { user.login });
         }
     }
 
@@ -61,9 +61,9 @@ public class DapperUserData : IUserData
         {
             var sqlQuery = """
                 UPDATE "Users"
-                SET created_at = @CreatedAt, contacts = @Contacts, about = @About,
-                pasword = @Password, is_moderator = @IsModerator 
-                WHERE login = @Login
+                SET created_at = @created_at, contacts = @contacts, about = @about,
+                pasword = @pasword, is_moderator = @is_moderator 
+                WHERE login = @login
                 """;
             db.Execute(sqlQuery, user);
         }

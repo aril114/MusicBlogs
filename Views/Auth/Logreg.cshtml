@@ -1,0 +1,36 @@
+﻿@{
+    ViewData["Title"] = "Авторизация";
+}
+
+<h4 class="mb-3">Вход</h4>
+<form asp-action="Login" method="post">
+    <div class="row g-3">
+        <div class="col-sm-6">
+            <label for="login" class="form-label">Имя пользователя</label>
+            <input class="form-control" type="text" name="login" />
+        </div>
+        <div class="col-sm-6">
+            <label for="password" class="form-label">Пароль</label>
+            <input class="form-control" type="password" name="password" />
+        </div>
+        <button class="w-25 btn btn-primary btn-lg" type="submit">Войти</button>
+    </div>
+</form>
+
+<!-- Разделитель -->
+<hr class="my-4" />
+
+<h4 class="mb-3">Регистрация</h4>
+<form asp-action="Register" method="post">
+    <div class="row g-3">
+        <div class="col-sm-6">
+            <label for="login" class="form-label">Имя пользователя</label>
+            <input class="form-control" type="text" name="login" />
+        </div>
+        <div class="col-sm-6">
+            <label for="password" class="form-label">Пароль</label>
+            <input class="form-control" type="password" name="password" />
+        </div>
+        <button class="w-25 btn btn-primary btn-lg" type="submit">Зарегистрироваться</button>
+    </div>
+</form>
