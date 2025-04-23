@@ -4,7 +4,7 @@
     ViewData["Title"] = "Последние статьи";
 }
 
-<div class="articles">
+<div class="articles d-flex flex-column gap-3">
     @foreach (Article article in Model)
     {
         <partial name="_ArticleExcerpt" model="@article" />
