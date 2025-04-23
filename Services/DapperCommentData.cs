@@ -2,6 +2,7 @@
 using MusicBlogs.Models;
 using Npgsql;
 using System.Data;
+using System.Reflection;
 
 namespace MusicBlogs.Services;
 
@@ -17,15 +18,15 @@ public class DapperCommentData : ICommentData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(Comment newComment)
+    public void Add(string content, int id_Articles, string login_Users, int? answer_to = null)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "Comments" (content, title, "login_Users") VALUES
-                (@content, @title, @login_Users)
+                INSERT INTO "Comments" (content, "id_Articles", "login_Users", answer_to) VALUES
+                (@content, @id_Articles, @login_Users, @answer_to)
                 """;
-            db.Execute(sqlQuery, newComment);
+            db.Execute(sqlQuery, new { content, id_Articles, login_Users, answer_to });
         }
     }
 

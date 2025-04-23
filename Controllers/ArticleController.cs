@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MusicBlogs.Models;
 using MusicBlogs.Services;
 using MusicBlogs.ViewModels;
 
@@ -37,5 +39,14 @@ public class ArticleController : Controller
             comments);
 
         return View(model);
+    }
+
+    [Authorize]
+    [HttpPost]
+    public IActionResult AddComment(int articleId, string text, int? answerTo)
+    {
+        string author = User.Identity.Name;
+        _comments.Add(text, articleId, author, answerTo);
+        return RedirectToAction("Index", new { id = articleId });
     }
 }

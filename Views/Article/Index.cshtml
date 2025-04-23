@@ -6,30 +6,32 @@
 
 <script>
     'use strict';
+
+    // Убирает ответ из нового комментария
     function removeAnswerTo() {
-        document.getElementById("answerToRoot").remove();
+    document.getElementById("answerToRoot").remove();
     }
 
-     function setAnswerTo(commentId) {
-        if (document.getElementById("answerToRoot") !== null) {
-            removeAnswerTo();
-        }
-
-        const form = document.getElementById("addCommentForm");
-
-        const root = document.createElement("div");
-        root.id = "answerToRoot";
-
-        root.innerHTML = `<input hidden name="commentId" value=` + commentId + `>
-        <span>
-        <i class="text-muted small">Ответ на <a href="#comment_` + commentId + `">другой комментарий</a></i>
-        <button class="btn btn-secondary btn-sm" onclick="removeAnswerTo()">&times;</button>
-        </span>`;
-
-        form.insertBefore(root, form.children[0]);
+    // Устанавливает ответ новому комментарию
+    function setAnswerTo(commentId) {
+    if (document.getElementById("answerToRoot") !== null) {
+    removeAnswerTo();
     }
-    // <i class="text-muted small">Ответ на <a href="#comment_1">другой комментарий</a></i>
-    // <span class="text-bg-secondary badge small">&times;</span>
+
+    const form = document.getElementById("addCommentForm");
+
+    const root = document.createElement("div");
+    root.id = "answerToRoot";
+
+    root.innerHTML = `<input hidden name="answerTo" value=` + commentId + `>
+    <span>
+    <i class="text-muted small">Ответ на <a href="#comment_` + commentId + `">другой комментарий</a></i>
+    <button class="btn btn-secondary btn-sm" onclick="removeAnswerTo()">&times;</button>
+    </span>`;
+
+    // новые элементы вставляются в начало формы
+    form.insertBefore(root, form.children[0]);
+    }
 </script>
 
 <!-- Статья -->
@@ -62,25 +64,32 @@
     <h5 class="mb-4 fw-normal">Комментарии</h5>
 
     <div class="comments">
-    @foreach (Comment comment in Model.comments)
-    {
-        <div class="mb-4 ms-4" id="comment_@comment.id">
-            <div class="d-flex align-items-center mb-1 gap-2">
-                <span class="fw-semibold">@comment.login_Users</span>
-                <span class="text-muted small">@comment.published_at.ToString("g")</span>
+        @foreach (Comment comment in Model.comments)
+        {
+            <div class="mb-4 ms-4" id="comment_@comment.id">
+                <div class="d-flex align-items-center mb-1 gap-2">
+                    <span class="fw-semibold">@comment.login_Users</span>
+                    <span class="text-muted small">@comment.published_at.ToString("g")</span>
+                </div>
+                <p class="mb-2">@comment.content</p>
+                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(@comment.id)">Ответить</button>
             </div>
-            <p class="mb-2">@comment.content</p>
-            <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(@comment.id)">Ответить</button>
-        </div>
-    }
+        }
     </div>
 
-    <!-- Форма добавления комментария -->
-    <h6 class="mb-3 mt-5 fw-normal">Добавить комментарий</h6>
-    <form asp-action="AddComment" asp-route-articleid="@Model.id" method="post" id="addCommentForm">
-        <div class="d-flex flex-column mb-3 gap-1">
-            <textarea class="form-control" rows="3" placeholder="Ваш комментарий..." name="text"></textarea>
-        </div>
-        <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
-    </form>
+    @if (User.Identity.IsAuthenticated)
+    {
+        <!-- Форма добавления комментария -->
+        <h6 class="mb-3 mt-5 fw-normal">Добавить комментарий</h6>
+        <form asp-action="AddComment" asp-route-articleId="@Model.id" method="post" id="addCommentForm">
+            <div class="d-flex flex-column mb-3 gap-1">
+                <textarea class="form-control" rows="3" placeholder="Ваш комментарий..." name="text"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm">Отправить</button>
+        </form>
+    }
+    else
+    {
+        <span>Для добавления комментария нужно пройти <a asp-controller="Auth" asp-action="Logreg">аутентификацию</a></span>
+    }
 </div>

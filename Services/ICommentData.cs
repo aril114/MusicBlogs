@@ -4,7 +4,7 @@ namespace MusicBlogs.Services;
 
 public interface ICommentData
 {
-    void Add(Comment newComment);
+    void Add(string content, int id_Articles, string login_Users, int? answer_to = null);
     void Delete(Comment Comment);
     Comment? Get(int id, string userLogin);
     IEnumerable<Comment> GetAll();
