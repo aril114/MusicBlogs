@@ -86,7 +86,10 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Publish(int? id, string title, string text)
     {
-        var mdPipeline = new MarkdownPipelineBuilder().UseBootstrap().Build();
+        var mdPipeline = new MarkdownPipelineBuilder()
+            .UseBootstrap()
+            .UseSoftlineBreakAsHardlineBreak()
+            .Build();
 
         if (id != null)
         {
@@ -118,7 +121,10 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult PublishById(int id)
     {
-        var mdPipeline = new MarkdownPipelineBuilder().UseBootstrap().Build();
+        var mdPipeline = new MarkdownPipelineBuilder()
+            .UseBootstrap()
+            .UseSoftlineBreakAsHardlineBreak()
+            .Build();
 
         var draft = _draftArticleData.Get(id, User.Identity.Name);
 
