@@ -17,7 +17,7 @@ public class DapperDraftArticleData : IDraftArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(DraftArticle newDraftArticle)
+    public void Add(string content, string title, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
@@ -25,7 +25,7 @@ public class DapperDraftArticleData : IDraftArticleData
                 INSERT INTO "DraftArticles" (content, title, "login_Users") VALUES
                 (@content, @title, @login_Users)
                 """;
-            db.Execute(sqlQuery, newDraftArticle);
+            db.Execute(sqlQuery, new { content, title, login_Users });
         }
     }
 
@@ -38,13 +38,13 @@ public class DapperDraftArticleData : IDraftArticleData
         }
     }
 
-    public DraftArticle? Get(string id, string userLogin)
+    public DraftArticle? Get(int id, string userLogin)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<DraftArticle>("""
                 SELECT * FROM "DraftArticles"
-                WHERE id = @id AND "login_Users"=@login_Users
+                WHERE id = @id AND "login_Users" = @userLogin
                 """, new { id, userLogin }).FirstOrDefault();
         }
     }
@@ -54,6 +54,17 @@ public class DapperDraftArticleData : IDraftArticleData
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<DraftArticle>("SELECT * FROM \"DraftArticles\"").ToList();
+        }
+    }
+
+    public IEnumerable<DraftArticle> GetAllForUser(string userLogin)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            return db.Query<DraftArticle>("""
+                SELECT * FROM "DraftArticles"
+                WHERE "login_Users" = @userLogin
+                """, new { userLogin }).ToList();
         }
     }
 

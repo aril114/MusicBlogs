@@ -63,19 +63,26 @@
 <div class="border-top pt-4">
     <h5 class="mb-4 fw-normal">Комментарии</h5>
 
-    <div class="comments">
-        @foreach (Comment comment in Model.comments)
-        {
-            <div class="mb-4 ms-4" id="comment_@comment.id">
-                <div class="d-flex align-items-center mb-1 gap-2">
-                    <span class="fw-semibold">@comment.login_Users</span>
-                    <span class="text-muted small">@comment.published_at.ToString("g")</span>
+    @if (Model.comments.Any())
+    {
+        <div class="comments">
+            @foreach (Comment comment in Model.comments)
+            {
+                <div class="mb-4 ms-4" id="comment_@comment.id">
+                    <div class="d-flex align-items-center mb-1 gap-2">
+                        <span class="fw-semibold">@comment.login_Users</span>
+                        <span class="text-muted small">@comment.published_at.ToString("g")</span>
+                    </div>
+                    <p class="mb-2">@comment.content</p>
+                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(@comment.id)">Ответить</button>
                 </div>
-                <p class="mb-2">@comment.content</p>
-                <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(@comment.id)">Ответить</button>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
+    else
+    {
+        <i>Комментариев нет</i>
+    }
 
     @if (User.Identity.IsAuthenticated)
     {
