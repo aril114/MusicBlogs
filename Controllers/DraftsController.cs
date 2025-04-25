@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Markdig;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Services;
 
@@ -85,6 +86,8 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Publish(int? id, string title, string text)
     {
+        var mdPipeline = new MarkdownPipelineBuilder().UseBootstrap().Build();
+
         if (id != null)
         {
             var draft = _draftArticleData.Get(id.Value, User.Identity.Name);
@@ -94,14 +97,18 @@ public class DraftsController : Controller
                 return BadRequest();
             }
 
-            _articleData.Add(text, title, User.Identity.Name);
+            string htmledContent = Markdown.ToHtml(text, mdPipeline);
+
+            _articleData.Add(htmledContent, title, User.Identity.Name);
 
             _draftArticleData.Delete(draft);
         }
 
         else
         {
-            _articleData.Add(text, title, User.Identity.Name);
+            string htmledContent = Markdown.ToHtml(text, mdPipeline);
+
+            _articleData.Add(htmledContent, title, User.Identity.Name);
         }
 
         return Ok("Ваша статья опубликована");
@@ -111,6 +118,8 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult PublishById(int id)
     {
+        var mdPipeline = new MarkdownPipelineBuilder().UseBootstrap().Build();
+
         var draft = _draftArticleData.Get(id, User.Identity.Name);
 
         if (draft == null)
@@ -118,7 +127,9 @@ public class DraftsController : Controller
             return BadRequest();
         }
 
-        _articleData.Add(draft.content, draft.title, User.Identity.Name);
+        string htmledContent = Markdown.ToHtml(draft.content, mdPipeline);
+
+        _articleData.Add(htmledContent, draft.title, User.Identity.Name);
 
         _draftArticleData.Delete(draft);
 
