@@ -51,7 +51,7 @@ public class DapperArticleData : IArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            return db.Query<Article>("SELECT * FROM \"Articles\"").ToList();
+            return db.Query<Article>("SELECT * FROM \"Articles\" ORDER BY published_at DESC").ToList();
         }
     }
 
@@ -64,6 +64,24 @@ public class DapperArticleData : IArticleData
                 WHERE "login_Users" = @userLogin
                 """, new { userLogin }).ToList();
                 
+        }
+    }
+
+    public IEnumerable<Article> Search(string query, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            string searchIn = searchInTitle ? "title" : "content";
+
+            string sortBy = sortByDate ? "published_at" : "rating";
+
+            string sortOrder = sortDesc ? "DESC" : "ASC";
+
+            return db.Query<Article>($"""
+                SELECT * FROM "Articles"
+                WHERE "{searchIn}" ~* @query
+                ORDER BY {sortBy} {sortOrder}
+                """, new { query }).ToList();
         }
     }
 

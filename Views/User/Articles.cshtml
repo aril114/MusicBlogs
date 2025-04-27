@@ -22,7 +22,9 @@
     </div>
 </nav>
 
+<div class="articles d-flex flex-column gap-3">
 @foreach (Article article in Model)
 {
     <partial name="_ArticleExcerpt" model="@article" />
 }
+</div>

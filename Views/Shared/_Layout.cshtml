@@ -19,9 +19,9 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (User.Identity.IsAuthenticated)
-                        {
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <ul class="navbar-nav flex-grow-1">    
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Drafts" asp-action="Create">Написать статью</a>
                             </li>
@@ -29,16 +29,25 @@
                                 <a class="nav-link text-dark" asp-controller="Drafts" asp-action="Index">Черновики</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Выйти из @@@User.Identity.Name</a>
+                                <a class="nav-link text-dark" asp-controller="Search" asp-action="Index">Поиск</a>
                             </li>
-                        }
-                        else
-                        {
+                        </ul>
+
+                        <div class="col-md-3 text-end">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logout">Выйти из @@@User.Identity.Name</a>
+                        </div>
+                    }
+                    else
+                    {
+                        <ul class="navbar-nav flex-grow-1">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logreg">Войти или зарегистрироваться</a>
+                                <a class="nav-link text-dark" asp-controller="Search" asp-action="Index">Поиск</a>
                             </li>
-                        }
-                    </ul>
+                        </ul>
+                        <div class="col-md-3 text-end">
+                            <a class="nav-link text-dark" asp-controller="Auth" asp-action="Logreg">Войти или зарегистрироваться</a>
+                        </div>
+                    }
                 </div>
             </div>
         </nav>

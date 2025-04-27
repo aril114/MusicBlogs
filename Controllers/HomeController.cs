@@ -7,9 +7,6 @@ namespace MusicBlogs.Controllers;
 
 public class HomeController : Controller
 {
-    const string SessionLogin = "login";
-    const string SessionPassword = "password";
-
     private readonly ILogger<HomeController> _logger;
     private IArticleData _articles;
 
@@ -23,11 +20,6 @@ public class HomeController : Controller
     {
         var model = _articles.GetAll();
         return View(model);
-    }
-
-    public IActionResult Privacy()
-    {
-        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

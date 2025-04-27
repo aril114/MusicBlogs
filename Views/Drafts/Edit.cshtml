@@ -14,9 +14,11 @@
 </div>
 
 <form method="post" asp-route-id="@Model.id" id="editForm">
-    <label for="title" class="h-6">Заголовок</label>
-    <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
-    <input type="text" class="form-control" name="title" value="@Model.title" placeholder="Как будет называться ваша статья?" />
+    <div class="mb-3">
+        <label for="title" class="h-6">Заголовок</label>
+        <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
+        <input type="text" class="form-control" name="title" value="@Model.title" placeholder="Как будет называться ваша статья?" />
+    </div>
     <label for="text" class="h-6">Содержание</label>
     <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
     <textarea name="text">@Model.content</textarea>
