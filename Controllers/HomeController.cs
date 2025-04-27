@@ -22,6 +22,13 @@ public class HomeController : Controller
         return View(model);
     }
 
+    [Route("/bestrated")]
+    public IActionResult BestRated()
+    {
+        var model = _articles.GetAll(sortByDate: false);
+        return View(model);
+    }
+
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()
     {

@@ -8,7 +8,7 @@ public interface IArticleData
     void Delete(Article article);
     Article? Get(int id);
     IEnumerable<Article> Search(string query, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true);
-    IEnumerable<Article> GetAll();
+    IEnumerable<Article> GetAll(bool sortByDate = true);
     IEnumerable<Article> GetAllForUser(string userLogin);
     void Update(Article article);
 }
