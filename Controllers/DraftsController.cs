@@ -102,7 +102,11 @@ public class DraftsController : Controller
 
             string htmledContent = Markdown.ToHtml(text, mdPipeline);
 
-            _articleData.Add(htmledContent, title, User.Identity.Name);
+            string excerpt = getMDExcerpt(text, 4);
+
+            string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
+
+            _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
 
             _draftArticleData.Delete(draft);
         }
@@ -111,7 +115,11 @@ public class DraftsController : Controller
         {
             string htmledContent = Markdown.ToHtml(text, mdPipeline);
 
-            _articleData.Add(htmledContent, title, User.Identity.Name);
+            string excerpt = getMDExcerpt(text, 4);
+
+            string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
+
+            _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
         }
 
         return Ok("Ваша статья опубликована");
@@ -133,12 +141,38 @@ public class DraftsController : Controller
             return BadRequest();
         }
 
+        string excerpt = getMDExcerpt(draft.content, 4);
+
+        string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
+
         string htmledContent = Markdown.ToHtml(draft.content, mdPipeline);
 
-        _articleData.Add(htmledContent, draft.title, User.Identity.Name);
+        _articleData.Add(htmledContent, draft.title, htmledExcerpt, User.Identity.Name);
 
         _draftArticleData.Delete(draft);
 
         return Ok("Ваша статья опубликована");
+    }
+
+    [NonAction]
+    private string getMDExcerpt(string articleMDContent, int maxLines)
+    {
+        string[] lines = articleMDContent.Split('\n');
+
+        int lineCount = lines.Length;
+
+        string excerpt;
+
+        if (lineCount > maxLines)
+        {
+            excerpt = String.Join("\n", lines.Take(4).Append("…"));
+        }
+
+        else
+        {
+            excerpt = articleMDContent;
+        }
+
+        return excerpt;
     }
 }

@@ -17,15 +17,15 @@ public class DapperArticleData : IArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(string content, string title, string login_Users)
+    public void Add(string content, string title, string excerpt, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "Articles" (content, title, "login_Users") VALUES
-                (@content, @title, @login_Users)
+                INSERT INTO "Articles" (content, title, excerpt, "login_Users") VALUES
+                (@content, @title, @excerpt, @login_Users)
                 """;
-            db.Execute(sqlQuery, new { content, title, login_Users });
+            db.Execute(sqlQuery, new { content, title, excerpt, login_Users });
         }
     }
 
@@ -64,7 +64,7 @@ public class DapperArticleData : IArticleData
             return db.Query<Article>("""
                 SELECT * FROM "Articles"
                 WHERE "login_Users" = @userLogin
-                ORDER BY "publihsed_at" DESC
+                ORDER BY "published_at" DESC
                 """, new { userLogin }).ToList();
                 
         }
