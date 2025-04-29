@@ -4,36 +4,6 @@
     ViewData["Title"] = Model.title;
 }
 
-<script>
-    'use strict';
-
-    // Убирает ответ из нового комментария
-    function removeAnswerTo() {
-    document.getElementById("answerToRoot").remove();
-    }
-
-    // Устанавливает ответ новому комментарию
-    function setAnswerTo(commentId) {
-    if (document.getElementById("answerToRoot") !== null) {
-    removeAnswerTo();
-    }
-
-    const form = document.getElementById("addCommentForm");
-
-    const root = document.createElement("div");
-    root.id = "answerToRoot";
-
-    root.innerHTML = `<input hidden name="answerTo" value=` + commentId + `>
-    <span>
-    <i class="text-muted small">Ответ на <a href="#comment_` + commentId + `">другой комментарий</a></i>
-    <button class="btn btn-secondary btn-sm" onclick="removeAnswerTo()">&times;</button>
-    </span>`;
-
-    // новые элементы вставляются в начало формы
-    form.insertBefore(root, form.children[0]);
-    }
-</script>
-
 <!-- Статья -->
 <div class="container mb-3">
     <div class="row justify-content-center">
@@ -44,7 +14,22 @@
                 <div class="d-flex small text-muted align-items-center gap-2">
                     <a class="page-link" asp-controller="User" asp-route-username="@Model.author">@@@Model.author</a>
                     <span class="fw-light">@Model.published_at.ToString("f")</span>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <div>
+                            <div class="badge bg-success bg-opacity-10 text-success">
+                                Рейтинг: <span id="rating">@Model.rating</span>
+                            </div>
+                            <div class="btn-group btn-group-sm" role="group" aria-label="Кнопки установки рейтинга">
+                                <button type="button" onclick="likeArticle(@Model.id)" class="btn btn-outline-primary py-0 px-1">+</button>
+                                <button type="button" onclick="dislikeArticle(@Model.id)" class="btn btn-outline-primary py-0 px-1">-</button>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
                     <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
+                    }
                 </div>
 
                 <!-- Заголовок статьи -->
@@ -63,26 +48,7 @@
 <div class="border-top pt-4">
     <h5 class="mb-4 fw-normal">Комментарии</h5>
 
-    @if (Model.comments.Any())
-    {
-        <div class="comments">
-            @foreach (Comment comment in Model.comments)
-            {
-                <div class="mb-4 ms-4" id="comment_@comment.id">
-                    <div class="d-flex align-items-center mb-1 gap-2">
-                        <span class="fw-semibold">@comment.login_Users</span>
-                        <span class="text-muted small">@comment.published_at.ToString("g")</span>
-                    </div>
-                    <p class="mb-2">@comment.content</p>
-                    <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(@comment.id)">Ответить</button>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <i>Комментариев нет</i>
-    }
+    <ul id="comments"></ul>
 
     @if (User.Identity.IsAuthenticated)
     {
@@ -97,6 +63,101 @@
     }
     else
     {
-        <span>Для добавления комментария нужно пройти <a asp-controller="Auth" asp-action="Logreg">аутентификацию</a></span>
+        <div>Для добавления комментария нужно пройти <a asp-controller="Auth" asp-action="Logreg">аутентификацию</a></div>
     }
 </div>
+
+@section Scripts{
+    <script type="text/javascript">
+        'use strict';
+
+        // Убирает ответ из нового комментария
+        function removeAnswerTo() {
+            document.getElementById("answerToRoot").remove();
+        }
+
+        // Устанавливает ответ новому комментарию
+        function setAnswerTo(commentId) {
+            if (document.getElementById("answerToRoot") !== null) {
+                removeAnswerTo();
+            }
+
+            const form = document.getElementById("addCommentForm");
+
+            const root = document.createElement("div");
+            root.id = "answerToRoot";
+
+            root.innerHTML = `<input hidden name="answerTo" value=` + commentId + `>
+            <span>
+            <i class="text-muted small">Ответ на <a href="#comment_` + commentId + `">другой комментарий</a></i>
+            <button class="btn btn-secondary btn-sm" onclick="removeAnswerTo()">&times;</button>
+            </span>`;
+
+            // новые элементы вставляются в начало формы
+            form.insertBefore(root, form.children[0]);
+        }
+
+        function likeArticle(id) {
+            $('#rating').load('/a/' + id + '/like');
+        }
+
+        function dislikeArticle(id) {
+            $('#rating').load('/a/' + id + '/dislike');
+        }
+
+        $(document).ready(function () {
+            $.ajax({
+                url: "/a/@Model.id/comments",
+                context: $("#comments"), // $(this) теперь ссылается на элемент div с id comments
+                statusCode: {
+                    404: function () {
+                        $(this).html("<i>Ошибка 404 при загрузке комментариев</i>");
+                    }
+                },
+                success: function (data) {
+                    const commentsRoot = document.getElementById("comments");
+
+                    if (data.length == 0) {
+                        $(this).html("<i>Комментариев нет</i>")
+                    }
+
+                    for (const e of data) {
+                        const id = e["id"];
+                        const content = e["content"]
+                        const published_at = e["published_at"];
+                        const login_Users = e["login_Users"];
+                        const answer_to = e["answer_to"];
+
+                        const published_atStr = new Date(published_at).toLocaleString();
+
+                        const comment = document.createElement("ul");
+                        comment.id = "comment_" + id;
+                        comment.className = "pt-2";
+
+                        comment.innerHTML = `<div>
+                            <span class="fw-semibold">${login_Users}</span>
+                            <span class="text-muted small">${published_atStr}</span>
+                        </div>
+                        <div>${content}</div>
+                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(${id})">Ответить</button>`;
+
+                        if (answer_to == 0) {
+                            commentsRoot.appendChild(comment);
+                        }
+
+                        else {
+                            const parentComment = document.getElementById(`comment_${answer_to}`);
+                            parentComment.appendChild(comment);
+                        }
+                    }
+                },
+                error: function (xhr) {
+                    $(this).html(`<i>Ошибка ${xhr.status} при загрузке комментариев<br>
+                    Описание: ${xhr.statusText}</i>`);
+                }
+            });
+
+            // $.ajax();
+        });
+    </script>
+}

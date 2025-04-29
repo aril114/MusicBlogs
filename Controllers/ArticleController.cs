@@ -41,6 +41,67 @@ public class ArticleController : Controller
         return View(model);
     }
 
+    [Route("/a/{id}/rating")]
+    public IActionResult GetRating(int id)
+    {
+        var article = _articles.Get(id);
+
+        if (article == null)
+        {
+            return BadRequest();
+        }
+
+        return new ObjectResult(article.rating);
+    }
+
+    [Authorize]
+    [Route("/a/{id}/like")]
+    public IActionResult Like(int id)
+    {
+        var article = _articles.Get(id);
+
+        if (article == null)
+        {
+            return BadRequest();
+        }
+
+        int newRating = article.rating + 1;
+
+        var newArticle = article with { rating = newRating };
+
+        _articles.Update(newArticle);
+
+        return new ObjectResult(newRating);
+    }
+
+    [Authorize]
+    [Route("/a/{id}/dislike")]
+    public IActionResult Dislike(int id)
+    {
+        var article = _articles.Get(id);
+
+        if (article == null)
+        {
+            return BadRequest();
+        }
+
+        int newRating = article.rating - 1;
+
+        var newArticle = article with { rating = newRating };
+
+        _articles.Update(newArticle);
+
+        return new ObjectResult(newRating);
+    }
+
+    [Route("/a/{id}/comments")]
+    public IActionResult GetComments(int id)
+    {
+        var comments = _comments.GetAllForArticle(id);
+
+        return new ObjectResult(comments);
+    }
+
     [Authorize]
     [HttpPost]
     public IActionResult AddComment(int articleId, string text, int? answerTo)
