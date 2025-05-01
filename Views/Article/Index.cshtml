@@ -28,7 +28,7 @@
                     }
                     else
                     {
-                    <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
+                        <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
                     }
                 </div>
 
@@ -39,6 +39,15 @@
                 <div class="text-wrap text-break">
                     @Html.Raw(Model.content)
                 </div>
+
+                <!-- Теги, если есть -->
+                <div class="small text-muted">
+                    Теги:
+                    @foreach (string tag in Model.tags)
+                    {
+                        <a asp-controller="Search" asp-action="ByTag" asp-route-name="@tag">@tag</a>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -48,7 +57,7 @@
 <div class="border-top pt-4">
     <h5 class="mb-4 fw-normal">Комментарии</h5>
 
-    <ul id="comments"></ul>
+    <div id="comments"></div>
 
     @if (User.Identity.IsAuthenticated)
     {
@@ -130,9 +139,8 @@
 
                         const published_atStr = new Date(published_at).toLocaleString();
 
-                        const comment = document.createElement("ul");
+                        const comment = document.createElement("div");
                         comment.id = "comment_" + id;
-                        comment.className = "pt-2";
 
                         comment.innerHTML = `<div>
                             <span class="fw-semibold">${login_Users}</span>
@@ -142,10 +150,12 @@
                         <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(${id})">Ответить</button>`;
 
                         if (answer_to == 0) {
+                            comment.className = "pt-2";
                             commentsRoot.appendChild(comment);
                         }
 
                         else {
+                            comment.className = "ms-4 pt-2";
                             const parentComment = document.getElementById(`comment_${answer_to}`);
                             parentComment.appendChild(comment);
                         }
@@ -156,8 +166,6 @@
                     Описание: ${xhr.statusText}</i>`);
                 }
             });
-
-            // $.ajax();
         });
     </script>
 }

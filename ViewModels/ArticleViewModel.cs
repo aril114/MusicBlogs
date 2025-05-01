@@ -8,4 +8,5 @@ public record ArticleViewModel(int id,
     string content,
     string title,
     string author,
-    IEnumerable<Comment> comments);
+    IEnumerable<Comment> comments,
+    IEnumerable<string> tags);

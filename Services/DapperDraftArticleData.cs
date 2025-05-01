@@ -17,15 +17,15 @@ public class DapperDraftArticleData : IDraftArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(string content, string title, string login_Users)
+    public void Add(string content, string title, string tags, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "DraftArticles" (content, title, "login_Users") VALUES
-                (@content, @title, @login_Users)
+                INSERT INTO "DraftArticles" (content, title, tags, "login_Users") VALUES
+                (@content, @title, @tags, @login_Users)
                 """;
-            db.Execute(sqlQuery, new { content, title, login_Users });
+            db.Execute(sqlQuery, new { content, title, tags, login_Users });
         }
     }
 
@@ -53,7 +53,10 @@ public class DapperDraftArticleData : IDraftArticleData
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            return db.Query<DraftArticle>("SELECT * FROM \"DraftArticles\"").ToList();
+            return db.Query<DraftArticle>("""
+                SELECT * FROM "DraftArticles"
+                """).ToList();
+                
         }
     }
 
@@ -64,6 +67,7 @@ public class DapperDraftArticleData : IDraftArticleData
             return db.Query<DraftArticle>("""
                 SELECT * FROM "DraftArticles"
                 WHERE "login_Users" = @userLogin
+                ORDER BY id DESC
                 """, new { userLogin }).ToList();
         }
     }
@@ -74,7 +78,7 @@ public class DapperDraftArticleData : IDraftArticleData
         {
             var sqlQuery = """
                 UPDATE "DraftArticles"
-                SET content = @content, title = @title
+                SET content = @content, title = @title, tags = @tags
                 WHERE id = @id AND "login_Users" = @login_Users
                 """;
             db.Execute(sqlQuery, DraftArticle);

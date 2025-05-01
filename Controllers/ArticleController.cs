@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MusicBlogs.Models;
 using MusicBlogs.Services;
 using MusicBlogs.ViewModels;
 
@@ -10,24 +9,34 @@ public class ArticleController : Controller
 {
     private IArticleData _articles;
     private ICommentData _comments;
+    private ITagData _tags;
+    private ILikeData _likes;
 
-    public ArticleController(IArticleData articleData, ICommentData commentData)
+
+    public ArticleController(IArticleData articleData, ICommentData commentData,
+        ITagData tagData, ILikeData likeData)
     {
         _articles = articleData;
         _comments = commentData;
+        _tags = tagData;
+        _likes = likeData;
     }
 
     [Route("/a/{id}")]
-    public IActionResult Index(string id)
+    public IActionResult Index(int id)
     {
-        var article = _articles.Get(int.Parse(id));
+        var article = _articles.Get(id);
 
         if (article == null)
         {
             return NotFound();
         }
 
-        var comments = _comments.GetAllForArticle(int.Parse(id));
+        var comments = _comments.GetAllForArticle(id);
+
+        var dbTags = _tags.GetAllForArticle(id);
+
+        string[] tags = dbTags.Select(t => t.name).ToArray();
 
         var model = new ArticleViewModel(
             article.id,
@@ -36,7 +45,8 @@ public class ArticleController : Controller
             article.content,
             article.title,
             article.login_Users,
-            comments);
+            comments,
+            tags);
 
         return View(model);
     }
@@ -58,18 +68,16 @@ public class ArticleController : Controller
     [Route("/a/{id}/like")]
     public IActionResult Like(int id)
     {
-        var article = _articles.Get(id);
+        var like = _likes.Get(User.Identity.Name, id);
 
-        if (article == null)
+        if (like != null)
         {
             return BadRequest();
         }
 
-        int newRating = article.rating + 1;
+        _likes.Add(User.Identity.Name, id);
 
-        var newArticle = article with { rating = newRating };
-
-        _articles.Update(newArticle);
+        int newRating = _articles.Get(id).rating;
 
         return new ObjectResult(newRating);
     }
@@ -78,18 +86,16 @@ public class ArticleController : Controller
     [Route("/a/{id}/dislike")]
     public IActionResult Dislike(int id)
     {
-        var article = _articles.Get(id);
+        var like = _likes.Get(User.Identity.Name, id);
 
-        if (article == null)
+        if (like == null)
         {
             return BadRequest();
         }
 
-        int newRating = article.rating - 1;
+        _likes.Delete(like);
 
-        var newArticle = article with { rating = newRating };
-
-        _articles.Update(newArticle);
+        int newRating = _articles.Get(id).rating;
 
         return new ObjectResult(newRating);
     }

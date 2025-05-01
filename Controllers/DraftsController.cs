@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Services;
+using System.Text.RegularExpressions;
 
 namespace MusicBlogs.Controllers;
 
@@ -10,10 +11,13 @@ public class DraftsController : Controller
 {
     private IArticleData _articleData;
     private IDraftArticleData _draftArticleData;
-    public DraftsController(IArticleData articleData, IDraftArticleData draftArticleData)
+    private ITagData _tagData;
+
+    public DraftsController(IArticleData articleData, IDraftArticleData draftArticleData, ITagData tagData)
     {
         _articleData = articleData;
         _draftArticleData = draftArticleData;
+        _tagData = tagData;
     }
 
     // GET: MyArticlesController
@@ -32,9 +36,9 @@ public class DraftsController : Controller
     // POST: MyArticlesController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(string title, string text)
+    public ActionResult Create(string title, string text, string tags)
     {
-        _draftArticleData.Add(text, title, User.Identity.Name);
+        _draftArticleData.Add(text, title, tags, User.Identity.Name);
         return RedirectToAction("Index");
     }
 
@@ -48,7 +52,7 @@ public class DraftsController : Controller
     // POST: MyArticlesController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Edit(int id, string title, string text)
+    public ActionResult Edit(int id, string title, string text, string tags)
     {
         var oldDraft = _draftArticleData.Get(id, User.Identity.Name);
 
@@ -57,7 +61,7 @@ public class DraftsController : Controller
             return BadRequest();
         }
 
-        var newDraft = oldDraft with { title = title, content = text };
+        var newDraft = oldDraft with { title = title, content = text, tags = tags };
 
         _draftArticleData.Update(newDraft);
 
@@ -84,13 +88,16 @@ public class DraftsController : Controller
     // статьи данные формы, а не данные черновика из БД
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Publish(int? id, string title, string text)
+    public ActionResult Publish(int? id, string title, string text, string tags)
     {
         var mdPipeline = new MarkdownPipelineBuilder()
             .UseBootstrap()
             .UseSoftlineBreakAsHardlineBreak()
             .Build();
 
+        int articleId;
+
+        // Публикуется черновик, для которого в БД уже есть запись
         if (id != null)
         {
             var draft = _draftArticleData.Get(id.Value, User.Identity.Name);
@@ -106,11 +113,22 @@ public class DraftsController : Controller
 
             string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
 
-            _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
+            articleId = _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
 
             _draftArticleData.Delete(draft);
+
+            if (!string.IsNullOrWhiteSpace(tags))
+            {
+                string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
+
+                foreach (string tag in splittedTags)
+                {
+                    _tagData.Add(tag, articleId);
+                }
+            }
         }
 
+        // Создается новая статья, которая и публикуется
         else
         {
             string htmledContent = Markdown.ToHtml(text, mdPipeline);
@@ -119,10 +137,20 @@ public class DraftsController : Controller
 
             string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
 
-            _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
+            articleId = _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
+
+            if (!string.IsNullOrWhiteSpace(tags))
+            {
+                string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
+
+                foreach (string tag in splittedTags)
+                {
+                    _tagData.Add(tag, articleId);
+                }
+            }
         }
 
-        return Ok("Ваша статья опубликована");
+        return RedirectToAction("Index", "Article", new { id = articleId });
     }
 
     [HttpPost]
@@ -147,11 +175,21 @@ public class DraftsController : Controller
 
         string htmledContent = Markdown.ToHtml(draft.content, mdPipeline);
 
-        _articleData.Add(htmledContent, draft.title, htmledExcerpt, User.Identity.Name);
+        int articleId = _articleData.Add(htmledContent, draft.title, htmledExcerpt, User.Identity.Name);
+
+        if (!string.IsNullOrWhiteSpace(draft.tags))
+        {
+            string[] splittedTags = Regex.Split(draft.tags, @"\s*,\s*");
+
+            foreach (string tag in splittedTags)
+            {
+                _tagData.Add(tag, articleId);
+            }
+        }
 
         _draftArticleData.Delete(draft);
 
-        return Ok("Ваша статья опубликована");
+        return RedirectToAction("Index", "Article", new { id = articleId });
     }
 
     [NonAction]

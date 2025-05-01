@@ -2,6 +2,7 @@
 using MusicBlogs.Models;
 using Npgsql;
 using System.Data;
+using System.Data.Common;
 
 namespace MusicBlogs.Services;
 
@@ -17,15 +18,16 @@ public class DapperArticleData : IArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(string content, string title, string excerpt, string login_Users)
+    public int Add(string content, string title, string excerpt, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "Articles" (content, title, excerpt, "login_Users") VALUES
-                (@content, @title, @excerpt, @login_Users)
+                INSERT INTO "Articles" (content, title, excerpt, "login_Users")
+                VALUES (@content, @title, @excerpt, @login_Users)
+                RETURNING id
                 """;
-            db.Execute(sqlQuery, new { content, title, excerpt, login_Users });
+            return db.Query<int>(sqlQuery, new { content, title, excerpt, login_Users }).First();
         }
     }
 
@@ -67,6 +69,40 @@ public class DapperArticleData : IArticleData
                 ORDER BY "published_at" DESC
                 """, new { userLogin }).ToList();
                 
+        }
+    }
+
+    // 
+    public IEnumerable<Article> GetAllWithTags(IEnumerable<string> tags, bool sortByDate = true)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            string sortBy = sortByDate ? "published_at" : "rating";
+
+            var tagList = tags.ToList();
+            var tagCount = tagList.Count;
+
+            if (tagCount == 0)
+            {
+                return Enumerable.Empty<Article>();
+            }
+
+            string sqlQuery = """
+                SELECT a.*
+                FROM "Articles" a
+                INNER JOIN "Tags" t ON a.id = t."id_Articles"
+                WHERE t.name = ANY(@tags)
+                GROUP BY a.id
+                HAVING COUNT(t.name) = @tagCount
+                ORDER BY @sortBy
+                """;
+
+            return db.Query<Article>(sqlQuery, new
+            {
+                tags = tagList,
+                tagCount,
+                sortBy
+            });
         }
     }
 

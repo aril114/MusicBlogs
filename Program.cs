@@ -12,6 +12,8 @@ builder.Services.AddSingleton<IArticleData, DapperArticleData>();
 builder.Services.AddSingleton<IDraftArticleData, DapperDraftArticleData>();
 builder.Services.AddSingleton<ICommentData, DapperCommentData>();
 builder.Services.AddSingleton<IUserData, DapperUserData>();
+builder.Services.AddSingleton<ILikeData, DapperLikeData>();
+builder.Services.AddSingleton<ITagData, DapperTagData>();
 
 var app = builder.Build();
 

@@ -6,5 +6,6 @@
 /// <param name="id">ID, часть первичного ключа</param>
 /// <param name="content">Текст</param>
 /// <param name="title">Заголовок</param>
+/// <param name="tags">Теги, разделенные запятой</param>
 /// <param name="login_Users">Логин автора, часть первичного ключа</param>
-public record DraftArticle(int id, string content, string title, string login_Users);
+public record DraftArticle(int id, string content, string title, string tags, string login_Users);

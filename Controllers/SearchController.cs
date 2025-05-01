@@ -14,12 +14,12 @@ public class SearchController : Controller
         _users = userData;
     }
 
-    public IActionResult Index()
+    public ActionResult Index()
     {
         return View();
     }
 
-    public IActionResult Q(string query, string searchIn, string sortBy, string ascDesc)
+    public ActionResult Q(string query, string searchIn, string sortBy, string ascDesc)
     {
         bool searchInTitle = searchIn == "title" ? true : false;
 
@@ -30,5 +30,11 @@ public class SearchController : Controller
         var model = _articles.Search(query, searchInTitle, sortByDate, desc);
 
         return View(model);
+    }
+
+    public ActionResult ByTag(string name)
+    {
+        var model = _articles.GetAllWithTags(new string[] { name });
+        return View("Q", model);
     }
 }
