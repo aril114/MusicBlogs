@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using MusicBlogs.Models;
 using MusicBlogs.Services;
 
@@ -9,6 +10,7 @@ public class UserController : Controller
     private IUserData _users;
     private IArticleData _articles;
     private ICommentData _comments;
+    private const int _articlesPerPage = 5;
 
     public UserController(IUserData userData, IArticleData articleData,
         ICommentData commentData)
@@ -49,7 +51,7 @@ public class UserController : Controller
     }
 
     [Route("/u/{username}/articles")]
-    public IActionResult Articles(string username)
+    public IActionResult Articles(string username, int? page)
     {
         if (_users.Get(username) == null)
         {
@@ -57,6 +59,51 @@ public class UserController : Controller
         }
 
         IEnumerable<Article> model = _articles.GetAllForUser(username);
+
+        PagingInfo p = new PagingInfo()
+        {
+            CurrentPage = page ?? 1,
+            ItemsPerPage = _articlesPerPage,
+            TotalItems = model.Count()
+        };
+
+        ViewBag.PageInfo = p;
+
+        model = model
+            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
+            .Take(p.ItemsPerPage)
+            .ToList();
+
+
+        ViewBag.username = username;
+
+        return View(model);
+    }
+
+    [Route("/u/{username}/articles/bestrated")]
+    public IActionResult BestRatedArticles(string username, int? page)
+    {
+        if (_users.Get(username) == null)
+        {
+            return NotFound();
+        }
+
+        IEnumerable<Article> model = _articles.GetAllForUser(username, sortByDate: false);
+
+        PagingInfo p = new PagingInfo()
+        {
+            CurrentPage = page ?? 1,
+            ItemsPerPage = _articlesPerPage,
+            TotalItems = model.Count()
+        };
+
+        ViewBag.PageInfo = p;
+
+        model = model
+            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
+            .Take(p.ItemsPerPage)
+            .ToList();
+
 
         ViewBag.username = username;
 

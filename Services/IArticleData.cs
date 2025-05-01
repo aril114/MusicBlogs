@@ -10,6 +10,6 @@ public interface IArticleData
     IEnumerable<Article> Search(string query, string[]? tags, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true);
     IEnumerable<Article> GetAll(bool sortByDate = true);
     IEnumerable<Article> GetAllWithTags(string[] tags, bool sortByDate = true);
-    IEnumerable<Article> GetAllForUser(string userLogin);
+    IEnumerable<Article> GetAllForUser(string userLogin, bool sortByDate = true);
     void Update(Article article);
 }

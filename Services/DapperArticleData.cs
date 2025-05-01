@@ -58,14 +58,16 @@ public class DapperArticleData : IArticleData
         }
     }
 
-    public IEnumerable<Article> GetAllForUser(string userLogin)
+    public IEnumerable<Article> GetAllForUser(string userLogin, bool sortByDate = true)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            return db.Query<Article>("""
+            string sortBy = sortByDate ? "published_at" : "rating";
+
+            return db.Query<Article>($"""
                 SELECT * FROM "Articles"
                 WHERE "login_Users" = @userLogin
-                ORDER BY "published_at" DESC
+                ORDER BY {sortBy} DESC
                 """, new { userLogin }).ToList();
 
         }
