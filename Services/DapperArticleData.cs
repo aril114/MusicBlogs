@@ -2,7 +2,6 @@
 using MusicBlogs.Models;
 using Npgsql;
 using System.Data;
-using System.Data.Common;
 
 namespace MusicBlogs.Services;
 
@@ -68,19 +67,18 @@ public class DapperArticleData : IArticleData
                 WHERE "login_Users" = @userLogin
                 ORDER BY "published_at" DESC
                 """, new { userLogin }).ToList();
-                
+
         }
     }
 
     // 
-    public IEnumerable<Article> GetAllWithTags(IEnumerable<string> tags, bool sortByDate = true)
+    public IEnumerable<Article> GetAllWithTags(string[] tags, bool sortByDate = true)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             string sortBy = sortByDate ? "published_at" : "rating";
 
-            var tagList = tags.ToList();
-            var tagCount = tagList.Count;
+            int tagCount = tags.Length;
 
             if (tagCount == 0)
             {
@@ -99,14 +97,14 @@ public class DapperArticleData : IArticleData
 
             return db.Query<Article>(sqlQuery, new
             {
-                tags = tagList,
+                tags,
                 tagCount,
                 sortBy
             });
         }
     }
 
-    public IEnumerable<Article> Search(string query, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true)
+    public IEnumerable<Article> Search(string? query, string[]? tags, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
@@ -116,11 +114,35 @@ public class DapperArticleData : IArticleData
 
             string sortOrder = sortDesc ? "DESC" : "ASC";
 
-            return db.Query<Article>($"""
-                SELECT * FROM "Articles"
-                WHERE "{searchIn}" ~* @query
-                ORDER BY {sortBy} {sortOrder}
-                """, new { query }).ToList();
+            var builder = new SqlBuilder();
+            var template = builder.AddTemplate("""
+                SELECT a.*
+                FROM "Articles" a
+                /**innerjoin**/
+                /**where**/
+                /**groupby**/
+                /**having**/
+                /**orderby**/
+                """);
+
+            if (tags != null && tags.Length > 0)
+            {
+                builder.InnerJoin("""
+                    "Tags" t ON a.id = t."id_Articles"
+                    """);
+                builder.Where("t.name = ANY(@tags)", new { tags });
+                builder.GroupBy("a.id");
+                builder.Having("COUNT(t.name) = @tagCount", new { tagCount = tags.Length });
+            }
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                builder.Where($"{searchIn} ~* @query", new { query });
+            }
+
+            builder.OrderBy($"{sortBy} {sortOrder}");
+
+            return db.Query<Article>(template.RawSql, template.Parameters);
         }
     }
 

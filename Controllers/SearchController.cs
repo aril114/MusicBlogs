@@ -1,17 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Services;
+using System.Text.RegularExpressions;
 
 namespace MusicBlogs.Controllers;
 
 public class SearchController : Controller
 {
     private IArticleData _articles;
-    private IUserData _users;
 
-    public SearchController(IArticleData articleData, IUserData userData)
+    public SearchController(IArticleData articleData)
     {
         _articles = articleData;
-        _users = userData;
     }
 
     public ActionResult Index()
@@ -19,7 +18,7 @@ public class SearchController : Controller
         return View();
     }
 
-    public ActionResult Q(string query, string searchIn, string sortBy, string ascDesc)
+    public ActionResult Q(string? query, string? tags, string searchIn, string sortBy, string ascDesc)
     {
         bool searchInTitle = searchIn == "title" ? true : false;
 
@@ -27,14 +26,21 @@ public class SearchController : Controller
 
         bool desc = ascDesc == "desc" ? true : false;
 
-        var model = _articles.Search(query, searchInTitle, sortByDate, desc);
+        string[]? splittedTags = null;
+
+        if (tags != null)
+        {
+            splittedTags = Regex.Split(tags, @"\s*,\s*");
+        }
+
+        var model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc);
 
         return View(model);
     }
 
     public ActionResult ByTag(string name)
     {
-        var model = _articles.GetAllWithTags(new string[] { name });
+        var model = _articles.GetAllWithTags([name]);
         return View("Q", model);
     }
 }
