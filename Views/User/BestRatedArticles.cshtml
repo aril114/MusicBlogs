@@ -44,26 +44,4 @@
 }
 </div>
 
-<tfoot>
-    <tr>
-        <td colspan="5">
-            Страница:
-            <div class="btn-group pull-right m-1">
-                @{
-                    PagingInfo p = ViewBag.PageInfo;
-                    for (int e = 1; e <= p.TotalPages; e++)
-                    {
-                        if (e == p.CurrentPage)
-                        {
-                            <a class="btn-primary btn btn-sm disabled" asp-route-page="@e">@e</a>
-                        }
-                        else
-                        {
-                            <a class="btn-outline-primary btn btn-sm" asp-route-page="@e">@e</a>
-                        }
-                    }
-                }
-            </div>
-        </td>
-    </tr>
-</tfoot>
+<partial name="_Pagination" model="@ViewBag.PageInfo" />

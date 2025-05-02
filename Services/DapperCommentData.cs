@@ -92,7 +92,7 @@ public class DapperCommentData : ICommentData
             string sqlQuery = """
                 SELECT * FROM "Comments"
                 WHERE "login_Users" = @userLogin
-                ORDER BY "published_at"
+                ORDER BY "published_at" DESC
                 """;
 
             return db.Query<Comment>(sqlQuery, new { userLogin }).ToList();

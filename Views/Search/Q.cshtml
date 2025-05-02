@@ -2,9 +2,39 @@
     ViewData["Title"] = "Найденные статьи";
 }
 
-<div class="articles d-flex flex-column gap-3">
+<div class="articles d-flex flex-column gap-3 mb-3">
     @foreach (Article article in Model)
     {
         <partial name="_ArticleExcerpt" model="@article" />
     }
 </div>
+
+<tfoot>
+    <tr>
+        <td colspan="5">
+            Страница:
+            <div class="btn-group pull-right m-1">
+                @{
+                    PagingInfo p = ViewBag.PageInfo;
+                    for (int e = 1; e <= p.TotalPages; e++)
+                    {
+                        if (e == p.CurrentPage)
+                        {
+                            <a class="btn-primary btn btn-sm disabled">@e</a>
+                        }
+                        else
+                        {
+                            <a class="btn-outline-primary btn btn-sm"
+                               asp-route-page="@e"
+                               asp-route-query="@ViewBag.query"
+                               asp-route-tags="@ViewBag.tags"
+                               asp-route-searchIn="@ViewBag.searchIn"
+                               asp-route-sortBy="@ViewBag.sortBy"
+                               asp-route-ascDesc="@ViewBag.ascDesc">@e</a>
+                        }
+                    }
+                }
+            </div>
+        </td>
+    </tr>
+</tfoot>

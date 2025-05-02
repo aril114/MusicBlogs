@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using MusicBlogs.Models;
 using MusicBlogs.Services;
 using System.Text.RegularExpressions;
 
@@ -7,6 +8,7 @@ namespace MusicBlogs.Controllers;
 public class SearchController : Controller
 {
     private IArticleData _articles;
+    private const int _articlesPerPage = 5;
 
     public SearchController(IArticleData articleData)
     {
@@ -18,13 +20,13 @@ public class SearchController : Controller
         return View();
     }
 
-    public ActionResult Q(string? query, string? tags, string searchIn, string sortBy, string ascDesc)
+    public ActionResult Q(string? query, string? tags, string searchIn, string sortBy, string ascDesc, int? page)
     {
         bool searchInTitle = searchIn == "title" ? true : false;
 
-        bool sortByDate = sortBy == "date" ? true : false;
+        bool sortByDate = sortBy == "rating" ? false : true;
 
-        bool desc = ascDesc == "desc" ? true : false;
+        bool desc = ascDesc == "asc" ? false : true;
 
         string[]? splittedTags = null;
 
@@ -35,12 +37,27 @@ public class SearchController : Controller
 
         var model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc);
 
-        return View(model);
-    }
+        PagingInfo p = new PagingInfo()
+        {
+            CurrentPage = page ?? 1,
+            ItemsPerPage = _articlesPerPage,
+            TotalItems = model.Count()
+        };
 
-    public ActionResult ByTag(string name)
-    {
-        var model = _articles.GetAllWithTags([name]);
-        return View("Q", model);
+        ViewBag.PageInfo = p;
+
+        // Надо сохранить параметры поиска, чтобы в представлении добавить их ссылкам
+        ViewBag.query = query;
+        ViewBag.tags = tags;
+        ViewBag.searchIn = searchIn;
+        ViewBag.sortBy = sortBy;
+        ViewBag.ascDesc = ascDesc;
+
+        model = model
+            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
+            .Take(p.ItemsPerPage)
+            .ToList();
+
+        return View(model);
     }
 }

@@ -45,7 +45,7 @@
                     Теги:
                     @foreach (string tag in Model.tags)
                     {
-                        <a asp-controller="Search" asp-action="ByTag" asp-route-name="@tag">@tag</a>
+                        <a asp-controller="Search" asp-action="Q" asp-route-tags="@tag">@tag</a>
                     }
                 </div>
             </div>
@@ -95,11 +95,12 @@
 
             const root = document.createElement("div");
             root.id = "answerToRoot";
+            root.className = "mb-1";
 
             root.innerHTML = `<input hidden name="answerTo" value=` + commentId + `>
             <span>
             <i class="text-muted small">Ответ на <a href="#comment_` + commentId + `">другой комментарий</a></i>
-            <button class="btn btn-secondary btn-sm" onclick="removeAnswerTo()">&times;</button>
+            <button class="btn btn-sm btn-outline-danger py-0 px-1" onclick="removeAnswerTo()">&times;</button>
             </span>`;
 
             // новые элементы вставляются в начало формы

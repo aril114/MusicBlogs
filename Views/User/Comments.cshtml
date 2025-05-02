@@ -22,7 +22,7 @@
     </div>
 </nav>
 
-<div class="comments">
+<div class="comments mb-3">
 @foreach(Comment comment in Model)
 {
     <div class="mb-4 ms-4">
@@ -35,3 +35,5 @@
     </div>
 }
 </div>
+
+<partial name="_Pagination" model="@ViewBag.PageInfo" />
