@@ -1,5 +1,10 @@
 ﻿@model IEnumerable<DraftArticle>
 
+@{
+    ViewData["title"] = "Черновики";
+}
+
+
 <div class="drafts d-flex flex-column gap-3">
 @foreach (DraftArticle draft in Model)
 {

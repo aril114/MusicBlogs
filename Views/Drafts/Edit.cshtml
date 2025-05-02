@@ -8,12 +8,12 @@
 <script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
 
 <div class="d-flex justify-content-end gap-3">
-    <button type="submit" form="deleteForm" class="btn btn-danger">Удалить</button>
-    <button type="submit" form="editForm" asp-action="Publish" class="btn btn-secondary">Опубликовать</button>
-    <button type="submit" form="editForm" class="btn btn-primary">Сохранить</button>
+    <button type="submit" form="deleteForm" asp-route-id="@Model.id" class="btn btn-danger">Удалить</button>
+    <button type="submit" form="editForm" asp-route-id="@Model.id" asp-action="Publish" class="btn btn-secondary">Опубликовать</button>
+    <button type="submit" form="editForm" asp-route-id="@Model.id" class="btn btn-primary">Сохранить</button>
 </div>
 
-<form method="post" asp-route-id="@Model.id" id="editForm">
+<form method="post" id="editForm">
     <div class="mb-2">
         <label for="title" class="h-6">Заголовок</label>
         <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
@@ -31,7 +31,7 @@
     </script>
 </form>
 
-<form asp-action="Delete" id="deleteForm" asp-route-id="@Model.id"></form>
+<form asp-action="Delete" id="deleteForm"></form>
 
 @section Scripts
 {

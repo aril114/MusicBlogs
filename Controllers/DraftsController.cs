@@ -93,6 +93,7 @@ public class DraftsController : Controller
         var mdPipeline = new MarkdownPipelineBuilder()
             .UseBootstrap()
             .UseSoftlineBreakAsHardlineBreak()
+            .UseAdvancedExtensions()
             .Build();
 
         int articleId;
@@ -160,6 +161,7 @@ public class DraftsController : Controller
         var mdPipeline = new MarkdownPipelineBuilder()
             .UseBootstrap()
             .UseSoftlineBreakAsHardlineBreak()
+            .UseAdvancedExtensions()
             .Build();
 
         var draft = _draftArticleData.Get(id, User.Identity.Name);
