@@ -2,7 +2,6 @@
 using MusicBlogs.Models;
 using Npgsql;
 using System.Data;
-using System.Reflection;
 
 namespace MusicBlogs.Services;
 
@@ -39,14 +38,14 @@ public class DapperCommentData : ICommentData
         }
     }
 
-    public Comment? Get(int id, string login_Users)
+    public Comment? Get(int id, int id_Articles)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<Comment>("""
                 SELECT * FROM "Comments"
-                WHERE id = @id AND "login_Users"=@login_Users
-                """, new { id, login_Users }).FirstOrDefault();
+                WHERE id = @id AND "id_Articles"=@id_Articles
+                """, new { id, id_Articles }).FirstOrDefault();
         }
     }
 
@@ -64,7 +63,7 @@ public class DapperCommentData : ICommentData
         {
             var sqlQuery = """
                 UPDATE "Comments"
-                SET content = @content, title = @title, "login_Users" = @login_Users
+                SET content = @content, title = @title, "login_Users" = @login_Users, answer_to = @answer_to
                 WHERE id = @id
                 """;
             db.Execute(sqlQuery, Comment);

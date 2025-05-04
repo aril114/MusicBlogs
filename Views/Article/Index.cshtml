@@ -1,7 +1,15 @@
 ﻿@model MusicBlogs.ViewModels.ArticleViewModel
+@inject MusicBlogs.Services.IUserData _users
 
 @{
     ViewData["Title"] = Model.title;
+
+    bool is_moderator = false;
+
+    if (User.Identity.IsAuthenticated)
+    {
+        is_moderator = _users.Get(User.Identity.Name).is_moderator;
+    }
 }
 
 <!-- Статья -->
@@ -127,6 +135,8 @@
                 success: function (data) {
                     const commentsRoot = document.getElementById("comments");
 
+                    const is_moderator = @is_moderator.ToString().ToLower();
+
                     if (data.length == 0) {
                         $(this).html("<i>Комментариев нет</i>")
                     }
@@ -147,10 +157,26 @@
                             <span class="fw-semibold">${login_Users}</span>
                             <span class="text-muted small">${published_atStr}</span>
                         </div>
-                        <div>${content}</div>
-                        <button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(${id})">Ответить</button>`;
+                        <div>${content}</div>`;
 
-                        if (answer_to == 0) {
+                        const commentButtons = document.createElement("div");
+                        commentButtons.className = "commentButtons";
+                        commentButtons.innerHTML = `<button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(${id})">Ответить</button>`;
+
+                        if (is_moderator || "@User.Identity?.Name" === login_Users) {
+                            comment.innerHTML += `
+                                <form method="post" action="/Article/DeleteComment" id="deleteCommentForm_${id}">
+                                    <input type="number" name="articleId" hidden value="@Model.id" />
+                                    <input type="number" name="commentId" hidden value="${id}" />
+                                </form>`;
+
+                            commentButtons.innerHTML += `
+                                <button class="btn btn-sm btn-outline-danger py-0 px-2" form="deleteCommentForm_${id}" type="submit">Удалить</button>`;
+                        }
+
+                        comment.appendChild(commentButtons);
+
+                        if (answer_to === null) {
                             comment.className = "pt-2";
                             commentsRoot.appendChild(comment);
                         }

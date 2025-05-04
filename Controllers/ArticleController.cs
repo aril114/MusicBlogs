@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MusicBlogs.Models;
 using MusicBlogs.Services;
 using MusicBlogs.ViewModels;
 
@@ -11,15 +12,17 @@ public class ArticleController : Controller
     private ICommentData _comments;
     private ITagData _tags;
     private ILikeData _likes;
+    private IUserData _users;
 
 
     public ArticleController(IArticleData articleData, ICommentData commentData,
-        ITagData tagData, ILikeData likeData)
+        ITagData tagData, ILikeData likeData, IUserData userData)
     {
         _articles = articleData;
         _comments = commentData;
         _tags = tagData;
         _likes = likeData;
+        _users = userData;
     }
 
     [Route("/a/{id}")]
@@ -115,5 +118,28 @@ public class ArticleController : Controller
         string author = User.Identity.Name;
         _comments.Add(text, articleId, author, answerTo);
         return RedirectToAction("Index", new { id = articleId });
+    }
+
+    [Authorize]
+    [HttpPost]
+    public IActionResult DeleteComment(int articleId, int commentId)
+    {
+        Comment comment = _comments.Get(commentId, articleId);
+
+        if (comment == null)
+        {
+            return BadRequest();
+        }
+
+        User user = _users.Get(User.Identity.Name);
+
+        if (!(comment.login_Users == user.login || user.is_moderator))
+        {
+            return Unauthorized();
+        }
+
+        _comments.Delete(comment);
+
+        return Ok("Комментарий удален");
     }
 }
