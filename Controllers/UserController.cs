@@ -36,7 +36,7 @@ public class UserController : Controller
     }
 
     [Route("/u/{username}/comments")]
-    public IActionResult Comments(string username, int? page)
+    public IActionResult Comments(string username, int page = 1)
     {
         if (_users.Get(username) == null)
         {
@@ -47,7 +47,7 @@ public class UserController : Controller
 
         PagingInfo p = new PagingInfo()
         {
-            CurrentPage = page ?? 1,
+            CurrentPage = page,
             ItemsPerPage = _userCommentsPerPage,
             TotalItems = model.Count()
         };
@@ -64,19 +64,30 @@ public class UserController : Controller
         return View(model);
     }
 
+    /// <summary>
+    /// Статьи пользователя
+    /// </summary>
+    /// <param name="username">Имя автора статей</param>
+    /// <param name="page">Номер просматриваемой страницы</param>
+    /// <param name="sortBy">Поле, по которому производится сортировка. Date или rating</param>
+    /// <param name="ascDesc">Произвести сортировку по убыванию (desc) или возрастанию (asc)</param>
+    /// <returns></returns>
     [Route("/u/{username}/articles")]
-    public IActionResult Articles(string username, int? page)
+    public IActionResult Articles(string username, int page = 1, string sortBy = "date", string ascDesc = "desc")
     {
         if (_users.Get(username) == null)
         {
             return NotFound();
         }
 
-        IEnumerable<Article> model = _articles.GetAllForUser(username);
+        bool desc = ascDesc == "desc";
+        bool sortByDate = sortBy == "date";
+
+        IEnumerable<Article> model = _articles.GetAllForUser(username, sortByDate, desc);
 
         PagingInfo p = new PagingInfo()
         {
-            CurrentPage = page ?? 1,
+            CurrentPage = page,
             ItemsPerPage = _articlesPerPage,
             TotalItems = model.Count()
         };
@@ -90,37 +101,9 @@ public class UserController : Controller
 
 
         ViewBag.username = username;
+        ViewBag.sortBy = sortBy;
+        ViewBag.ascDesc = ascDesc;
 
         return View(model);
-    }
-
-    [Route("/u/{username}/articles/bestrated")]
-    public IActionResult BestRatedArticles(string username, int? page)
-    {
-        if (_users.Get(username) == null)
-        {
-            return NotFound();
-        }
-
-        IEnumerable<Article> model = _articles.GetAllForUser(username, sortByDate: false);
-
-        PagingInfo p = new PagingInfo()
-        {
-            CurrentPage = page ?? 1,
-            ItemsPerPage = _articlesPerPage,
-            TotalItems = model.Count()
-        };
-
-        ViewBag.PageInfo = p;
-
-        model = model
-            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
-            .Take(p.ItemsPerPage)
-            .ToList();
-
-
-        ViewBag.username = username;
-
-        return View(model);
-    }
+    }    
 }

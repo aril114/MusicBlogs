@@ -48,26 +48,30 @@ public class DapperArticleData : IArticleData
         }
     }
 
-    public IEnumerable<Article> GetAll(bool sortByDate = true)
+    public IEnumerable<Article> GetAll(bool sortByDate = true, bool desc = true)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             string sortBy = sortByDate ? "published_at" : "rating";
 
-            return db.Query<Article>($"SELECT * FROM \"Articles\" ORDER BY {sortBy} DESC").ToList();
+            string ascDesc = desc ? "DESC" : "ASC";
+
+            return db.Query<Article>($"SELECT * FROM \"Articles\" ORDER BY {sortBy} {ascDesc}").ToList();
         }
     }
 
-    public IEnumerable<Article> GetAllForUser(string userLogin, bool sortByDate = true)
+    public IEnumerable<Article> GetAllForUser(string userLogin, bool sortByDate = true, bool desc = true)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             string sortBy = sortByDate ? "published_at" : "rating";
+
+            string ascDesc = desc ? "DESC" : "ASC";
 
             return db.Query<Article>($"""
                 SELECT * FROM "Articles"
                 WHERE "login_Users" = @userLogin
-                ORDER BY {sortBy} DESC
+                ORDER BY {sortBy} {ascDesc}
                 """, new { userLogin }).ToList();
 
         }

@@ -17,13 +17,15 @@ public class HomeController : Controller
         _articles = articleData;
     }
 
-    public IActionResult Index(int? page)
+    public IActionResult Index(int page = 1, string sortBy = "date", string ascDesc = "desc")
     {
-        var model = _articles.GetAll();
+        bool sortByDate = sortBy == "date";
+        bool desc = ascDesc == "desc";
 
+        var model = _articles.GetAll(sortByDate, desc);
         PagingInfo p = new PagingInfo()
         {
-            CurrentPage = page ?? 1,
+            CurrentPage = page,
             ItemsPerPage = _articlesPerPage,
             TotalItems = model.Count()
         };
@@ -35,29 +37,8 @@ public class HomeController : Controller
             .Take(p.ItemsPerPage)
             .ToList();
 
-        return View(model);
-    }
-
-    [Route("/bestrated")]
-    public IActionResult BestRated(int? page)
-    {
-        int currentPage = page ?? 1;
-
-        var model = _articles.GetAll(sortByDate: false);
-
-        PagingInfo p = new PagingInfo()
-        {
-            CurrentPage = page ?? 1,
-            ItemsPerPage = _articlesPerPage,
-            TotalItems = model.Count()
-        };
-
-        ViewBag.PageInfo = p;
-
-        model = model
-            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
-            .Take(p.ItemsPerPage)
-            .ToList();
+        ViewBag.sortBy = sortBy;
+        ViewBag.ascDesc = ascDesc;
 
         return View(model);
     }

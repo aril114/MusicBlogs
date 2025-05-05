@@ -1,7 +1,7 @@
 ﻿@model IEnumerable<Article>
 @{
     string username = ViewBag.username;
-    ViewData["Title"] = $"Последние статьи от @{username}";
+    ViewData["Title"] = $"Статьи от @{username}";
 }
 
 <nav class="navbar navbar-expand rounded">
@@ -22,20 +22,7 @@
     </div>
 </nav>
 
-<nav class="navbar navbar-expand rounded">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" asp-action="Articles" asp-route-username="@username">Новые статьи</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="BestRatedArticles" asp-route-username="@username">Статьи с наибольшим рейтингом</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<partial name="_ArticleSort" />
 
 <div class="articles d-flex flex-column gap-3 mb-3">
 @foreach (Article article in Model)

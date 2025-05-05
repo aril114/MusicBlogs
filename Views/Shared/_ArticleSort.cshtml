@@ -1,0 +1,46 @@
+﻿<!-- Использует ViewBag.sortBy и ViewBag.ascDesc -->
+<form class="mb-3 d-flex col-lg-10 justify-content-center" id="sortForm">
+    <div class="row">
+        <label for="sortForm" class="mb-2">Сортировка статей</label>
+        <fieldset class="col">
+            <div class="form-check">
+                <input type="radio" name="sortBy" class="form-check-input" value="date"
+                @if (ViewBag.sortBy != "rating")
+                {
+                    @Html.Raw("checked");
+                }>
+                <label class="form-check-label" for="date">По дате публикации</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" name="sortBy" class="form-check-input" value="rating"
+                @if (ViewBag.sortBy == "rating")
+                {
+                    @Html.Raw("checked");
+                }>
+                <label class="form-check-label" for="rating">По рейтингу</label>
+            </div>
+        </fieldset>
+
+        <fieldset class="col">
+            <div class="form-check">
+                <input type="radio" name="ascDesc" class="form-check-input" value="desc"
+                @if (ViewBag.ascDesc != "asc")
+                {
+                    @Html.Raw("checked");
+                }>
+                <label class="form-check-label" for="desc">По убыванию</label>
+            </div>
+            <div class="form-check">
+                <input type="radio" name="ascDesc" class="form-check-input" value="asc"
+                @if (ViewBag.ascDesc == "asc")
+                {
+                    @Html.Raw("checked");
+                }>
+                <label class="form-check-label" for="asc">По возрастанию</label>
+            </div>
+        </fieldset>
+        <div class="mt-2">
+            <button class="btn btn-primary" type="submit">Отсортировать</button>
+        </div>
+    </div>
+</form>

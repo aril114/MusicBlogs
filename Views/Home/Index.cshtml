@@ -1,23 +1,10 @@
 ﻿@model IEnumerable<MusicBlogs.Models.Article>
 
 @{
-    ViewData["Title"] = "Последние статьи";
+    ViewData["Title"] = "Главная страница";
 }
 
-<nav class="navbar navbar-expand rounded">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" asp-action="Index">Новые статьи</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="BestRated">Статьи с наибольшим рейтингом</a>
-                </li>
-            </ul>
-        </div>
-    </div>
-</nav>
+<partial name="_ArticleSort" />
 
 <div class="articles d-flex flex-column gap-3 mb-3">
     @foreach (Article article in Model)
