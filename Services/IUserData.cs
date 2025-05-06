@@ -9,4 +9,6 @@ public interface IUserData
     User? Get(string login);
     IEnumerable<User> GetAll();
     void Update(User user);
+    void Ban(string login, string reason);
+    void Unban(string login);
 }

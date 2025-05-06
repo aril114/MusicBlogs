@@ -1,7 +1,14 @@
 ﻿@model MusicBlogs.Models.User
+@inject MusicBlogs.Services.IUserData _users
 @{
     string username = ViewBag.username;
     ViewData["Title"] = $"Пользователь {username}";
+    bool isViewedByModerator = false;
+
+    if (User.Identity.IsAuthenticated)
+    {
+        isViewedByModerator = _users.Get(User.Identity.Name).is_moderator;
+    }
 }
 
 <nav class="navbar navbar-expand rounded">
@@ -43,4 +50,22 @@
 else
 {
     <b>Обычный пользователь</b>
+}
+@if (Model.is_banned)
+{
+    <p><i>Пользователь забанен.</i> Причина бана: @Model.ban_reason</p>
+    if (!Model.is_moderator && isViewedByModerator)
+    {
+        <form asp-action="Unban" class="mt-3" asp-route-username="@Model.login" method="post">
+            <button class="btn btn-danger" type="submit">Разбанить пользователя</button>
+        </form>
+    }
+}
+else if (!Model.is_moderator && isViewedByModerator)
+{
+    <form asp-action="Ban" class="mt-3" asp-route-username="@Model.login" method="post">
+        <label>Забанить пользователя</label>
+        <input type="text" class="form-control mb-2" name="reason" placeholder="Причина бана" />
+        <button class="btn btn-danger" type="submit">Забанить</button>
+    </form>
 }

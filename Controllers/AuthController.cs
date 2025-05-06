@@ -10,7 +10,7 @@ namespace MusicBlogs.Controllers;
 public class AuthController : Controller
 {
     private IUserData _users;
-    public AuthController(IUserData userData) 
+    public AuthController(IUserData userData)
     {
         _users = userData;
     }

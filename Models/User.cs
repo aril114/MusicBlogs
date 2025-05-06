@@ -12,4 +12,4 @@ namespace MusicBlogs.Models;
 /// <param name="password">Пароль</param>
 /// <param name="is_moderator">Является ли модератором</param>
 public record User(string login, DateTime created_at, string contacts,
-    string about, string password, bool is_moderator);
+    string about, string password, bool is_moderator, bool is_banned, string ban_reason);

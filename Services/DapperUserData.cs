@@ -62,10 +62,36 @@ public class DapperUserData : IUserData
             var sqlQuery = """
                 UPDATE "Users"
                 SET created_at = @created_at, contacts = @contacts, about = @about,
-                pasword = @pasword, is_moderator = @is_moderator 
+                pasword = @pasword, is_moderator = @is_moderator, is_banned = @is_banned, ban_reason = @ban_reason
                 WHERE login = @login
                 """;
             db.Execute(sqlQuery, user);
+        }
+    }
+
+    public void Ban(string login, string reason)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            var sqlQuery = """
+                UPDATE "Users"
+                SET is_banned = true, ban_reason = @reason
+                WHERE login = @login
+                """;
+            db.Execute(sqlQuery, new { login, reason });
+        }
+    }
+
+    public void Unban(string login)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            var sqlQuery = """
+                UPDATE "Users"
+                SET is_banned = false, ban_reason = NULL
+                WHERE login = @login
+                """;
+            db.Execute(sqlQuery, new { login });
         }
     }
 }

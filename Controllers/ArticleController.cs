@@ -103,6 +103,36 @@ public class ArticleController : Controller
         return new ObjectResult(newRating);
     }
 
+    /// <summary>
+    /// Удаление статьи
+    /// </summary>
+    /// <param name="id">id статьи</param>
+    /// <returns></returns>
+    [Authorize]
+    [HttpPost]
+    [Route("/a/delete")]
+    public ActionResult Delete(int id)
+    {
+        User user = _users.Get(User.Identity.Name);
+
+        if (!user.is_moderator)
+        {
+            return Unauthorized();
+        }
+
+        Article article = _articles.Get(id);
+
+        if (article == null)
+        {
+            return BadRequest();
+        }
+
+        _articles.Delete(article);
+
+        return Ok("Статья удалена");
+    }
+
+
     [Route("/a/{id}/comments")]
     public IActionResult GetComments(int id)
     {
@@ -115,6 +145,12 @@ public class ArticleController : Controller
     [HttpPost]
     public IActionResult AddComment(int articleId, string text, int? answerTo)
     {
+        var userCommenting = _users.Get(User.Identity.Name);
+        if (userCommenting.is_banned)
+        {
+            return Unauthorized($"Вы забанены. Причина бана: {userCommenting.ban_reason}");
+        }
+
         string author = User.Identity.Name;
         _comments.Add(text, articleId, author, answerTo);
         return RedirectToAction("Index", new { id = articleId });

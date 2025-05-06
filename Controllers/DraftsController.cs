@@ -1,6 +1,7 @@
 ﻿using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MusicBlogs.Models;
 using MusicBlogs.Services;
 using System.Text.RegularExpressions;
 
@@ -12,12 +13,15 @@ public class DraftsController : Controller
     private IArticleData _articleData;
     private IDraftArticleData _draftArticleData;
     private ITagData _tagData;
+    private IUserData _userData;
 
-    public DraftsController(IArticleData articleData, IDraftArticleData draftArticleData, ITagData tagData)
+    public DraftsController(IArticleData articleData,
+        IDraftArticleData draftArticleData, ITagData tagData, IUserData userData)
     {
         _articleData = articleData;
         _draftArticleData = draftArticleData;
         _tagData = tagData;
+        _userData = userData;
     }
 
     // GET: MyArticlesController
@@ -90,6 +94,13 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult Publish(int? id, string title, string text, string tags)
     {
+        var userPublishing = _userData.Get(User.Identity.Name);
+
+        if (userPublishing.is_banned)
+        {
+            return Unauthorized($"Вы забанены. Причина бана: {userPublishing.ban_reason}");
+        }
+
         var mdPipeline = new MarkdownPipelineBuilder()
             .UseBootstrap()
             .UseSoftlineBreakAsHardlineBreak()
@@ -158,6 +169,13 @@ public class DraftsController : Controller
     [ValidateAntiForgeryToken]
     public ActionResult PublishById(int id)
     {
+        var userPublishing = _userData.Get(User.Identity.Name);
+
+        if (userPublishing.is_banned)
+        {
+            return Unauthorized($"Вы забанены. Причина бана: {userPublishing.ban_reason}");
+        }
+
         var mdPipeline = new MarkdownPipelineBuilder()
             .UseBootstrap()
             .UseSoftlineBreakAsHardlineBreak()

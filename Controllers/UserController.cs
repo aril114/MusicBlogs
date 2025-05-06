@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using MusicBlogs.Models;
 using MusicBlogs.Services;
 
@@ -105,5 +106,51 @@ public class UserController : Controller
         ViewBag.ascDesc = ascDesc;
 
         return View(model);
-    }    
+    }
+
+    [Authorize]
+    [HttpPost]
+    public ActionResult Ban(string username, string reason)
+    {
+        var userBanning = _users.Get(User.Identity.Name);
+
+        if (!userBanning.is_moderator)
+        {
+            return Unauthorized();
+        }
+
+        var toBeBanned = _users.Get(username);
+
+        if (toBeBanned == null || toBeBanned.is_moderator)
+        {
+            return BadRequest();
+        }
+
+        _users.Ban(username, reason);
+
+        return Ok($"{username} забанен");
+    }
+
+    [Authorize]
+    [HttpPost]
+    public ActionResult Unban(string username)
+    {
+        var userUnbanning = _users.Get(User.Identity.Name);
+
+        if (!userUnbanning.is_moderator)
+        {
+            return Unauthorized();
+        }
+
+        var toBeUnbanned = _users.Get(username);
+
+        if (toBeUnbanned == null || toBeUnbanned.is_moderator)
+        {
+            return BadRequest();
+        }
+
+        _users.Unban(username);
+
+        return Ok($"{username} разбанен");
+    }
 }
