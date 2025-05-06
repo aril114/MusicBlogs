@@ -10,15 +10,18 @@ public class UserController : Controller
     private IUserData _users;
     private IArticleData _articles;
     private ICommentData _comments;
+    private ModlogService _logger;
+
     private const int _articlesPerPage = 5;
     private const int _userCommentsPerPage = 20;
 
     public UserController(IUserData userData, IArticleData articleData,
-        ICommentData commentData)
+        ICommentData commentData, ModlogService logger)
     {
         _users = userData;
         _articles = articleData;
         _comments = commentData;
+        _logger = logger;
     }
 
     [Route("/u/{username}")]
@@ -128,6 +131,8 @@ public class UserController : Controller
 
         _users.Ban(username, reason);
 
+        _logger.LogAction("Бан", userBanning.login, $"Забаненный: {toBeBanned.login}, причина: {reason}");
+
         return Ok($"{username} забанен");
     }
 
@@ -150,6 +155,8 @@ public class UserController : Controller
         }
 
         _users.Unban(username);
+
+        _logger.LogAction("Разбан", userUnbanning.login, $"Разбаненный: {toBeUnbanned.login}");
 
         return Ok($"{username} разбанен");
     }

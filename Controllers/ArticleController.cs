@@ -13,16 +13,18 @@ public class ArticleController : Controller
     private ITagData _tags;
     private ILikeData _likes;
     private IUserData _users;
+    private ModlogService _logger;
 
 
     public ArticleController(IArticleData articleData, ICommentData commentData,
-        ITagData tagData, ILikeData likeData, IUserData userData)
+        ITagData tagData, ILikeData likeData, IUserData userData, ModlogService logger)
     {
         _articles = articleData;
         _comments = commentData;
         _tags = tagData;
         _likes = likeData;
         _users = userData;
+        _logger = logger;
     }
 
     [Route("/a/{id}")]
@@ -113,9 +115,9 @@ public class ArticleController : Controller
     [Route("/a/delete")]
     public ActionResult Delete(int id)
     {
-        User user = _users.Get(User.Identity.Name);
+        User userDeleting = _users.Get(User.Identity.Name);
 
-        if (!user.is_moderator)
+        if (!userDeleting.is_moderator)
         {
             return Unauthorized();
         }
@@ -128,6 +130,8 @@ public class ArticleController : Controller
         }
 
         _articles.Delete(article);
+
+        _logger.LogAction("Удаление статьи", userDeleting.login, $"Автор: {article.login_Users}, тема: {article.title}");
 
         return Ok("Статья удалена");
     }
@@ -167,14 +171,20 @@ public class ArticleController : Controller
             return BadRequest();
         }
 
-        User user = _users.Get(User.Identity.Name);
+        User userDeleting = _users.Get(User.Identity.Name);
 
-        if (!(comment.login_Users == user.login || user.is_moderator))
+        if (!(comment.login_Users == userDeleting.login || userDeleting.is_moderator))
         {
             return Unauthorized();
         }
 
         _comments.Delete(comment);
+
+        if (comment.login_Users != userDeleting.login)
+        {
+            _logger.LogAction("Удаление комментария", userDeleting.login,
+                $"Автор: {comment.login_Users}, текст: {comment.content}, ID статьи: {comment.id_Articles}");
+        }
 
         return Ok("Комментарий удален");
     }

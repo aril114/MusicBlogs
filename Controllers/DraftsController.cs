@@ -1,7 +1,6 @@
 ﻿using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MusicBlogs.Models;
 using MusicBlogs.Services;
 using System.Text.RegularExpressions;
 

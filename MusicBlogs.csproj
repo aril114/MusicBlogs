@@ -11,6 +11,8 @@
     <PackageReference Include="Dapper.SqlBuilder" Version="2.1.66" />
     <PackageReference Include="Markdig" Version="0.41.1" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
 
 </Project>
