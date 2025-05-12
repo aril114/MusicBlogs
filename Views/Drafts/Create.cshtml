@@ -10,11 +10,11 @@
     <button type="submit" form="editForm" class="btn btn-primary">Сохранить черновик</button>
 </div>
 
-<form method="post" id="editForm">
+<form method="post" id="editForm" onsubmit="validateContent()">
     <div class="mb-2">
         <label for="title" class="h-6">Заголовок</label>
         <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
-        <input type="text" class="form-control" name="title" placeholder="Как будет называться ваша статья?" />
+        <input type="text" class="form-control" name="title" placeholder="Как будет называться ваша статья?" required />
     </div>
     <div class="mb-2">
         <label for="tags" class="h-6">Теги</label>
@@ -22,14 +22,26 @@
     </div>
     <label for="text" class="h-6">Содержание</label>
     <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
-    <textarea name="text"></textarea>
-    <script>
-        const easyMDE = new EasyMDE({ spellChecker: false });
-    </script>
+    <textarea name="text" id="txtArea"></textarea>
 </form>
 
 @section Scripts
 {
-<script>const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))</script>
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    const easyMDE = new EasyMDE({ spellChecker: false });
+
+    // Не отправлять форму, если в содержании статьи либо
+    // ничего не введено, либо введены пробельные символы
+    document.getElementById('editForm').addEventListener('submit', function(e) {
+        const text = easyMDE.value();
+        const char_count = text.trim().length;
+
+        if (char_count == 0) {
+            alert("Содержание статьи должно быть задано");
+            e.preventDefault();
+        }
+    });
+</script>
 }
