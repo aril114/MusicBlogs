@@ -10,11 +10,12 @@
                     <a class="page-link" asp-controller="User" asp-action="Index" asp-route-username="@Model.login_Users">@@@Model.login_Users</a>
                     <span class="fw-light">@Model.published_at.ToString("f")</span>
                     <span class="badge bg-success bg-opacity-10 text-success">Рейтинг: @Model.rating</span>
-                    <a class="page-link" asp-controller="Article" asp-action="Index" asp-route-id="@Model.id">Перейти к статье</a>
                 </div>
 
                 <!-- Заголовок статьи -->
-                <h2 class="mb-3">@Model.title</h2>
+                <a class="page-link" asp-controller="Article" asp-action="Index" asp-route-id="@Model.id">
+                    <h2 class="mb-3">@Model.title</h2>
+                </a>
 
                 <!-- Содержание статьи -->
                 <div class="text-wrap text-break">
