@@ -207,11 +207,14 @@
                 comment.id = "comment_" + id;
                 comment.classList.add("comment", "pt-2");
 
-                comment.innerHTML = `<div class="d-flex small text-muted gap-2">
+                comment.innerHTML = `<div class="comment-header d-flex small text-muted gap-2">
                     <a class="page-link" href="/u/${login_Users}">@@${login_Users}</a>
                     <span class="fw-light">${published_atStr}</span>
-                </div>
-                <div>${content}</div>`;
+                </div>`;
+
+                const contentDiv = document.createElement("div");
+                contentDiv.innerText = content;
+                comment.appendChild(contentDiv);
 
                 const commentButtons = document.createElement("div");
                 commentButtons.className = "commentButtons";
