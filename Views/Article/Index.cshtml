@@ -79,22 +79,25 @@
 <div class="border-top pt-4">
     <h5 class="mb-2 fw-normal">Комментарии</h5>
     
-    <div class="mb-2" id="orderElement">
-        <span class="text-muted">Сначала</span>
-        <span id="commentsOrderLabel">новые</span>
-        <button class="btn btn-sm btn-outline-secondary" type="button" onclick="reverseComments()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
-                <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5" />
-            </svg>
-        </button>
-    </div>
+    @if (Model.comments.Any())
+    {
+        <div class="mb-2" id="orderElement">
+            <span class="text-muted">Сначала</span>
+            <span id="commentsOrderLabel">новые</span>
+            <button class="btn btn-sm btn-outline-secondary" type="button" onclick="reverseComments()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+                    <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5m-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5" />
+                </svg>
+            </button>
+        </div>
+    }
 
     <div id="comments"></div>
 
     @if (User.Identity.IsAuthenticated)
     {
         <!-- Форма добавления комментария -->
-        <h6 class="mb-3 mt-5 fw-normal">Добавить комментарий</h6>
+        <h6 class="mb-3 mt-3 fw-normal">Добавить комментарий</h6>
         <form asp-action="AddComment" asp-route-articleId="@Model.id" method="post" id="addCommentForm">
             <div class="d-flex flex-column mb-3 gap-1">
                 <textarea class="form-control" rows="3" placeholder="Ваш комментарий..." name="text"></textarea>
@@ -154,16 +157,7 @@
         }
 
         function reverseComments() {
-            const commentsContainer = document.getElementById('comments');
-            const comments = Array.from(commentsContainer.children);
-            
-            // Очищаем контейнер
-            commentsContainer.innerHTML = '';
-            
-            // Добавляем комментарии в обратном порядке
-            comments.reverse().forEach(comment => {
-              commentsContainer.appendChild(comment);
-            });
+            _reverseComments(document.getElementById('comments'));
 
             // Изменение отображаемого порядка
             const commentsOrderLabel = document.getElementById('commentsOrderLabel');
@@ -174,13 +168,30 @@
             commentsOrderLabel.innerText = orderAfter;
         }
 
+        function _reverseComments(commentsContainer) {
+            const comments = Array.from(commentsContainer.children);
+            
+            // Очищаем контейнер
+            commentsContainer.innerHTML = '';
+            
+            // Добавляем комментарии в обратном порядке
+            comments.reverse().forEach(comment => {
+                const hasChildComments = comment.getElementsByClassName("answers").length > 0;
+
+                if (hasChildComments) {
+                    _reverseComments(comment.getElementsByClassName("answers")[0]);
+                }
+
+                commentsContainer.appendChild(comment);
+            });
+        }
+
         function renderComments(comments, newestFirst) {
             const commentsRoot = document.getElementById("comments");
 
-            const is_moderator = @isModerator.ToString().ToLower();
-
             if (comments.length == 0) {
-                $(this).html("<i>Комментариев нет</i>");
+                $("#comments").html("<i>Комментариев нет</i>");
+                return;
             }
 
             for (const e of comments) {
@@ -194,6 +205,7 @@
 
                 const comment = document.createElement("div");
                 comment.id = "comment_" + id;
+                comment.classList.add("comment", "pt-2");
 
                 comment.innerHTML = `<div class="d-flex small text-muted gap-2">
                     <a class="page-link" href="/u/${login_Users}">@@${login_Users}</a>
@@ -205,31 +217,72 @@
                 commentButtons.className = "commentButtons";
                 commentButtons.innerHTML = `<button class="btn btn-sm btn-outline-secondary py-0 px-2" onclick="setAnswerTo(${id})">Ответить</button>`;
 
-                if (is_moderator || "@User.Identity?.Name" === login_Users) {
-                    comment.innerHTML += `
-                        <form method="post" action="/Article/DeleteComment" id="deleteCommentForm_${id}">
-                            <input type="number" name="articleId" hidden value="@Model.id" />
-                            <input type="number" name="commentId" hidden value="${id}" />
-                        </form>`;
-
-                    commentButtons.innerHTML += `
-                        <button class="btn btn-sm btn-outline-danger py-0 px-2" form="deleteCommentForm_${id}" type="submit">Удалить</button>`;
-                }
-
                 comment.appendChild(commentButtons);
 
                 if (answer_to === null) {
-                    comment.className = "pt-2";
-
                     if (newestFirst) {
                         commentsRoot.insertBefore(comment, commentsRoot.children[0]);
+                    }
+
+                    else {
+                        commentsRoot.appendChild(comment);
                     }
                 }
 
                 else {
-                    comment.className = "ms-4 pt-2";
+                    comment.classList.add("ms-4");
+
                     const parentComment = document.getElementById(`comment_${answer_to}`);
-                    parentComment.appendChild(comment);
+
+                    var childCommentsDiv = document.getElementById(`answers_${answer_to}`);
+
+                    if (childCommentsDiv === null) {
+                        childCommentsDiv = document.createElement("div");
+                        childCommentsDiv.id = `answers_${answer_to}`;
+                        childCommentsDiv.className = "answers";
+                        parentComment.appendChild(childCommentsDiv);
+                    }
+
+                    if (newestFirst) {
+                        const hasChildComments = parentComment.getElementsByClassName("comment").length != 0;
+
+                        if (hasChildComments) {
+                            childCommentsDiv.insertBefore(comment, childCommentsDiv.children[0]);
+                        }
+
+                        else {
+                            childCommentsDiv.appendChild(comment);
+                        }
+                    }
+
+                    else {
+                        childCommentsDiv.appendChild(comment);
+                    }
+                }
+            }
+
+            // Кнопки удаления
+            const is_moderator = @isModerator.ToString().ToLower();
+
+            for (const c of comments) {
+                const id = c["id"];
+
+                const htmlComment = document.getElementById("comment_" + id);
+                const hasChildComments = htmlComment.getElementsByClassName("comment").length != 0;
+
+                if (!hasChildComments) {
+                    if (is_moderator || "@User.Identity?.Name" === c["login_Users"]) {
+                        htmlComment.innerHTML += `
+                            <form method="post" action="/Article/DeleteComment" id="deleteCommentForm_${id}">
+                                <input type="number" name="articleId" hidden value="@Model.id" />
+                                <input type="number" name="commentId" hidden value="${id}" />
+                            </form>`;
+
+                        const commentButtons = htmlComment.getElementsByClassName("commentButtons")[0];
+
+                        commentButtons.innerHTML += `
+                            <button class="btn btn-sm btn-outline-danger py-0 px-2" form="deleteCommentForm_${id}" type="submit">Удалить</button>`;
+                    }
                 }
             }
         }

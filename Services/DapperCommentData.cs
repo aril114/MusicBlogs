@@ -97,4 +97,18 @@ public class DapperCommentData : ICommentData
             return db.Query<Comment>(sqlQuery, new { userLogin }).ToList();
         }
     }
+
+    public IEnumerable<Comment> GetAnswers(int parentCommentId, int id_Articles)
+    {
+        using (IDbConnection db = new NpgsqlConnection(_cn))
+        {
+            string sqlQuery = """
+                SELECT * FROM "Comments"
+                WHERE "answer_to" = @parentCommentId
+                AND "id_Articles" = @id_Articles
+                """;
+
+            return db.Query<Comment>(sqlQuery, new { parentCommentId, id_Articles }).ToList();
+        }
+    }
 }

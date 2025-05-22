@@ -10,5 +10,6 @@ public interface ICommentData
     IEnumerable<Comment> GetAll();
     IEnumerable<Comment> GetAllForArticle(int articleId);
     IEnumerable<Comment> GetAllForUser(string userLogin);
+    IEnumerable<Comment> GetAnswers(int parentCommentId, int id_Articles);
     void Update(Comment Comment);
 }
