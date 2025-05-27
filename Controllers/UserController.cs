@@ -12,7 +12,7 @@ public class UserController : Controller
     private ICommentData _comments;
     private ModlogService _logger;
 
-    private const int _articlesPerPage = 5;
+    private const int _articlesPerPage = 6;
     private const int _userCommentsPerPage = 20;
 
     public UserController(IUserData userData, IArticleData articleData,

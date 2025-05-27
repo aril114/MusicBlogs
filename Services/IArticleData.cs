@@ -4,7 +4,7 @@ namespace MusicBlogs.Services;
 
 public interface IArticleData
 {
-    int Add(string content, string title, string excerpt, string login_Users);
+    int Add(string content, string title, string excerpt, string preview_img, string login_Users);
     void Delete(Article article);
     Article? Get(int id);
     IEnumerable<Article> Search(string? query, string[]? tags, bool searchInTitle = true, bool sortByDate = true, bool sortDesc = true);

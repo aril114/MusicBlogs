@@ -8,7 +8,7 @@ namespace MusicBlogs.Controllers;
 public class SearchController : Controller
 {
     private IArticleData _articles;
-    private const int _articlesPerPage = 5;
+    private const int _articlesPerPage = 6;
 
     public SearchController(IArticleData articleData)
     {

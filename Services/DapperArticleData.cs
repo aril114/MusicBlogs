@@ -17,16 +17,17 @@ public class DapperArticleData : IArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public int Add(string content, string title, string excerpt, string login_Users)
+    public int Add(string content, string title, string excerpt, string preview_img, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
-            var sqlQuery = """
-                INSERT INTO "Articles" (content, title, excerpt, "login_Users")
-                VALUES (@content, @title, @excerpt, @login_Users)
+            string sqlQuery = """
+                INSERT INTO "Articles" (content, title, excerpt, preview_img, "login_Users")
+                VALUES (@content, @title, @excerpt, @preview_img, @login_Users)
                 RETURNING id
                 """;
-            return db.Query<int>(sqlQuery, new { content, title, excerpt, login_Users }).First();
+
+            return db.Query<int>(sqlQuery, new { content, title, excerpt, preview_img, login_Users }).First();
         }
     }
 

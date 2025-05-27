@@ -17,15 +17,15 @@ public class DapperDraftArticleData : IDraftArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(string content, string title, string tags, string login_Users)
+    public void Add(string content, string title, string tags, string excerpt, string preview_img, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
-                INSERT INTO "DraftArticles" (content, title, tags, "login_Users") VALUES
-                (@content, @title, @tags, @login_Users)
+                INSERT INTO "DraftArticles" (content, title, tags, excerpt, preview_img, "login_Users") VALUES
+                (@content, @title, @tags, @excerpt, @preview_img, @login_Users)
                 """;
-            db.Execute(sqlQuery, new { content, title, tags, login_Users });
+            db.Execute(sqlQuery, new { content, title, tags, excerpt, preview_img, login_Users });
         }
     }
 
@@ -78,7 +78,7 @@ public class DapperDraftArticleData : IDraftArticleData
         {
             var sqlQuery = """
                 UPDATE "DraftArticles"
-                SET content = @content, title = @title, tags = @tags
+                SET content = @content, title = @title, tags = @tags, excerpt = @excerpt, preview_img = @preview_img
                 WHERE id = @id AND "login_Users" = @login_Users
                 """;
             db.Execute(sqlQuery, DraftArticle);

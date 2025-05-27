@@ -1,16 +1,100 @@
-﻿@model IEnumerable<MusicBlogs.Models.Article>
-
-@{
+﻿@{
     ViewData["Title"] = "Главная страница";
+    IEnumerable<Article> lastArticles = ViewBag.lastArticles;
+    IEnumerable<Article> popularArticles = ViewBag.popularArticles;
 }
 
-<partial name="_ArticleSort" />
+<div class="row">
+    <div class="col-lg-3" style="width: 20%">
+        <div class="sidebar">
+            <h3 class="mb-4 fw-bold">Рубрики</h3>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#"><i class="bi bi-house-door me-2"></i>Все статьи</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Search" asp-action="Q" asp-route-tags="вводная" ><i class="bi bi-1-square me-2"></i>Вводные</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Search" asp-action="Q" asp-route-tags="shoegaze" ><i class="bi bi-2-square me-2"></i>Shoegaze</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Search" asp-action="Q" asp-route-tags="nugaze" ><i class="bi bi-3-square me-2"></i>Nugaze</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-controller="Search" asp-action="Q" asp-route-tags="blackgaze" ><i class="bi bi-4-square me-2"></i>Blackgaze</a>
+                </li>
+            </ul>
 
-<div class="articles d-flex flex-column gap-3 mb-3">
-    @foreach (Article article in Model)
-    {
-        <partial name="_ArticleExcerpt" model="@article" />
-    }
+            <h3 class="mt-5 mb-3 fw-bold">Популярные теги</h3>
+            <div class="d-flex flex-wrap">
+                <a asp-controller="Search" asp-action="Q" asp-route-tags="nugaze" class="btn btn-sm tag-btn btn-outline-primary">#nugaze</a>
+                <a asp-controller="Search" asp-action="Q" asp-route-tags="blackgaze" class="btn btn-sm tag-btn btn-outline-primary">#blackgaze</a>
+                <a asp-controller="Search" asp-action="Q" asp-route-tags="shoegaze" class="btn btn-sm tag-btn btn-outline-primary">#shoegaze</a>
+                <a asp-controller="Search" asp-action="Q" asp-route-tags="история" class="btn btn-sm tag-btn btn-outline-primary">#история</a>
+            </div>
+        </div>
+    </div>
+    <!-- Основной контент - сетка статей -->
+    <div class="col-lg-9">
+        <!-- Новые статьи -->
+        <div class="mb-5">
+            <div class="col-12">
+                <h4 class="column-header">Самые новые</h4>
+            </div>
+
+            <div class="row mb-2">
+                @foreach (Article article in lastArticles.Take(2))
+                {
+                    <partial name="_ArticleExcerptBig" model="@article" />
+                }
+            </div>
+            <div class="row mb-2">
+                @foreach (Article article in lastArticles.Skip(2).Take(3))
+                {
+                    <partial name="_ArticleExcerptSmall" model="@article" />
+                }
+            </div>
+
+            <!-- Кнопка "Показать еще" -->
+            <div class="text-center mt-2">
+                <button class="btn btn-primary btn-load-more">
+                    <a class="page-link" asp-controller="Search" asp-action="Q" asp-route-sortBy="date">
+                        <i class="bi bi-arrow-down-circle me-2"></i>Показать больше
+                    </a>
+                </button>
+            </div>
+        </div>
+
+        <!-- Популярные статьи -->
+        <div class="mb-5">
+            <div class="col-12">
+                <h4 class="column-header">Самые популярные</h4>
+            </div>
+
+            <div class="row mb-2">
+                @foreach (Article article in popularArticles.Take(2))
+                {
+                    <partial name="_ArticleExcerptBig" model="@article" />
+                }
+            </div>
+            <div class="row mb-2">
+                @foreach (Article article in popularArticles.Skip(2).Take(3))
+                {
+                    <partial name="_ArticleExcerptSmall" model="@article" />
+                }
+            </div>
+
+            <!-- Кнопка "Показать еще" -->
+            <div class="text-center mt-2">
+                <button class="btn btn-primary btn-load-more">
+                    <a class="page-link" asp-controller="Search" asp-action="Q" asp-route-sortBy="rating">
+                        <i class="bi bi-arrow-down-circle me-2"></i>Показать больше
+                    </a>
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<partial name="_Pagination" model="@ViewBag.PageInfo" />
+@* <partial name="_Pagination" model="@ViewBag.PageInfo" /> *@

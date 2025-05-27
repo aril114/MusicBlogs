@@ -23,6 +23,11 @@
 </nav>
 
 <div class="comments mb-3">
+    @if(!Model.Any())
+    {
+        <div>Пользователь не оставил ни одного комментария</div>
+    }
+
 @foreach(Comment comment in Model)
 {
     <div class="mb-4 ms-4">

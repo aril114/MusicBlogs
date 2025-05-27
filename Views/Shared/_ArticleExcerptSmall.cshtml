@@ -1,0 +1,38 @@
+﻿@model Article
+@* Большая карточка *@
+<div class="col-md-4">
+    <div class="card article-card">
+        <div style="font-size: 0.8rem" class="d-flex gap-3 m-1 ms-3">
+            <div>
+                <a class="page-link fw-semibold" asp-controller="User" asp-action="Index" asp-route-username="@Model.login_Users">
+                    <i class="bi bi-person"></i>@Model.login_Users
+                </a>
+            </div>
+            <span class="text-muted">@Model.published_at.ToShortDateString()</span>
+        </div>
+        <a class="card-title page-link ms-3" asp-controller="Article" asp-action="Index" asp-route-id="@Model.id">@Model.title</a>
+        @if (Model.preview_img != null)
+        {
+            <img src="@Model.preview_img" class="preview-img" alt="Превью к статье">
+            <div class="card-body">
+                <p class="card-text">@Model.excerpt</p>
+                <div class="article-meta">
+                    <div>
+                        <i class="bi bi-star me-1"></i>@Model.rating
+                    </div>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="card-body pt-0">
+                <p class="card-text">@Model.excerpt</p>
+                <div class="article-meta">
+                    <div>
+                        <i class="bi bi-star me-1"></i>@Model.rating
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

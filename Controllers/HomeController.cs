@@ -17,30 +17,39 @@ public class HomeController : Controller
         _articles = articleData;
     }
 
-    public IActionResult Index(int page = 1, string sortBy = "date", string ascDesc = "desc")
+    //public IActionResult Index(int page = 1, string sortBy = "date", string ascDesc = "desc")
+    //{
+    //    bool sortByDate = sortBy == "date";
+    //    bool desc = ascDesc == "desc";
+
+    //    var model = _articles.GetAll(sortByDate, desc);
+    //    PagingInfo p = new PagingInfo()
+    //    {
+    //        CurrentPage = page,
+    //        ItemsPerPage = _articlesPerPage,
+    //        TotalItems = model.Count()
+    //    };
+
+    //    ViewBag.PageInfo = p;
+
+    //    model = model
+    //        .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
+    //        .Take(p.ItemsPerPage)
+    //        .ToList();
+
+    //    ViewBag.sortBy = sortBy;
+    //    ViewBag.ascDesc = ascDesc;
+
+    //    return View(model);
+    //}
+
+    public IActionResult Index()
     {
-        bool sortByDate = sortBy == "date";
-        bool desc = ascDesc == "desc";
+        ViewBag.lastArticles = _articles.GetAll(sortByDate: true).Take(5);
 
-        var model = _articles.GetAll(sortByDate, desc);
-        PagingInfo p = new PagingInfo()
-        {
-            CurrentPage = page,
-            ItemsPerPage = _articlesPerPage,
-            TotalItems = model.Count()
-        };
+        ViewBag.popularArticles = _articles.GetAll(sortByDate: false).Take(5);
 
-        ViewBag.PageInfo = p;
-
-        model = model
-            .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
-            .Take(p.ItemsPerPage)
-            .ToList();
-
-        ViewBag.sortBy = sortBy;
-        ViewBag.ascDesc = ascDesc;
-
-        return View(model);
+        return View();
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

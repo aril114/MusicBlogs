@@ -1,6 +1,7 @@
 ﻿using Markdig;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MusicBlogs.Models;
 using MusicBlogs.Services;
 using System.Text.RegularExpressions;
 
@@ -39,9 +40,9 @@ public class DraftsController : Controller
     // POST: MyArticlesController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Create(string title, string text, string tags)
+    public ActionResult Create(string title, string text, string tags, string excerpt, string preview_img)
     {
-        _draftArticleData.Add(text, title, tags, User.Identity.Name);
+        _draftArticleData.Add(text, title, tags, excerpt, preview_img, User.Identity.Name);
         return RedirectToAction("Index");
     }
 
@@ -55,7 +56,7 @@ public class DraftsController : Controller
     // POST: MyArticlesController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Edit(int id, string title, string text, string tags)
+    public ActionResult Edit(int id, string title, string text, string tags, string excerpt, string previewImg)
     {
         var oldDraft = _draftArticleData.Get(id, User.Identity.Name);
 
@@ -64,7 +65,7 @@ public class DraftsController : Controller
             return BadRequest();
         }
 
-        var newDraft = oldDraft with { title = title, content = text, tags = tags };
+        var newDraft = oldDraft with { title = title, content = text, tags = tags, excerpt = excerpt, preview_img = previewImg };
 
         _draftArticleData.Update(newDraft);
 
@@ -91,7 +92,7 @@ public class DraftsController : Controller
     // статьи данные формы, а не данные черновика из БД
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Publish(int? id, string title, string text, string tags)
+    public ActionResult Publish(int? id, string title, string text, string tags, string excerpt, string previewImg)
     {
         var userPublishing = _userData.Get(User.Identity.Name);
 
@@ -106,58 +107,38 @@ public class DraftsController : Controller
             .UseAdvancedExtensions()
             .Build();
 
-        int articleId;
+        string htmledContent = Markdown.ToHtml(text, mdPipeline);
+
+        DraftArticle? draft = null;
 
         // Публикуется черновик, для которого в БД уже есть запись
         if (id != null)
         {
-            var draft = _draftArticleData.Get(id.Value, User.Identity.Name);
+            draft = _draftArticleData.Get(id.Value, User.Identity.Name);
 
             if (draft == null)
             {
                 return BadRequest();
             }
-
-            string htmledContent = Markdown.ToHtml(text, mdPipeline);
-
-            string excerpt = getMDExcerpt(text, 4);
-
-            string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
-
-            articleId = _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
-
-            _draftArticleData.Delete(draft);
-
-            if (!string.IsNullOrWhiteSpace(tags))
-            {
-                string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
-
-                foreach (string tag in splittedTags)
-                {
-                    _tagData.Add(tag, articleId);
-                }
-            }
         }
 
-        // Создается новая статья, которая и публикуется
-        else
+        // Либо создается новая статья, которая и публикуется
+        int articleId = _articleData.Add(htmledContent, title, excerpt, previewImg, User.Identity.Name);
+
+        // Удаление черновика, если публикуется он
+        if (draft != null)
         {
-            string htmledContent = Markdown.ToHtml(text, mdPipeline);
+            _draftArticleData.Delete(draft);
+        }
 
-            string excerpt = getMDExcerpt(text, 4);
+        // Добавление тегов
+        if (!string.IsNullOrWhiteSpace(tags))
+        {
+            string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
 
-            string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
-
-            articleId = _articleData.Add(htmledContent, title, htmledExcerpt, User.Identity.Name);
-
-            if (!string.IsNullOrWhiteSpace(tags))
+            foreach (string tag in splittedTags)
             {
-                string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
-
-                foreach (string tag in splittedTags)
-                {
-                    _tagData.Add(tag, articleId);
-                }
+                _tagData.Add(tag, articleId);
             }
         }
 
@@ -188,14 +169,16 @@ public class DraftsController : Controller
             return BadRequest();
         }
 
-        string excerpt = getMDExcerpt(draft.content, 4);
+        string excerpt = draft.excerpt;
 
-        string htmledExcerpt = Markdown.ToHtml(excerpt, mdPipeline);
+        string previewImg = draft.preview_img;
 
         string htmledContent = Markdown.ToHtml(draft.content, mdPipeline);
 
-        int articleId = _articleData.Add(htmledContent, draft.title, htmledExcerpt, User.Identity.Name);
+        // Добавление статьи в БД
+        int articleId = _articleData.Add(htmledContent, draft.title, excerpt, previewImg, User.Identity.Name);
 
+        // Теги
         if (!string.IsNullOrWhiteSpace(draft.tags))
         {
             string[] splittedTags = Regex.Split(draft.tags, @"\s*,\s*");

@@ -2,13 +2,14 @@
     ViewData["Title"] = "Найденные статьи";
 }
 
-<div class="articles d-flex flex-column gap-3 mb-3">
+<div class="row mb-2">
     @foreach (Article article in Model)
     {
-        <partial name="_ArticleExcerpt" model="@article" />
+        <partial name="_ArticleExcerptBig" model="@article" />
     }
 </div>
 
+<!-- Пагинация -->
 <tfoot>
     <tr>
         <td colspan="5">
