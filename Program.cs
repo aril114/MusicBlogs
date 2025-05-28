@@ -16,6 +16,7 @@ builder.Services.AddSingleton<ICommentData, DapperCommentData>();
 builder.Services.AddSingleton<IUserData, DapperUserData>();
 builder.Services.AddSingleton<ILikeData, DapperLikeData>();
 builder.Services.AddSingleton<ITagData, DapperTagData>();
+builder.Services.AddSingleton<IBookmarkData, DapperBookmarkData>();
 
 var app = builder.Build();
 

@@ -1,6 +1,7 @@
 ﻿@model MusicBlogs.ViewModels.ArticleViewModel
 @inject MusicBlogs.Services.IUserData _users
 @inject MusicBlogs.Services.ILikeData _likes;
+@inject MusicBlogs.Services.IBookmarkData _bookmars;
 
 @{
     ViewData["Title"] = Model.title;
@@ -8,11 +9,13 @@
     bool isModerator = false;
 
     bool isLiked = false;
+    bool isBookmarked = false;
 
     if (User.Identity.IsAuthenticated)
     {
         isModerator = _users.Get(User.Identity.Name).is_moderator;
         isLiked = _likes.Get(User.Identity.Name, Model.id) != null;
+        isBookmarked = _bookmars.Get(User.Identity.Name, Model.id) != null;
     }
 }
 
@@ -54,20 +57,31 @@
                     <!-- Рейтинг -->
                     @if (User.Identity.IsAuthenticated)
                     {
-                        @if (isLiked)
-                        {
-                            <button type="button" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded" id="ratingButton" onclick="dislikeArticle(@Model.id)">
+                        // Лайк
+                        <button type="button" title="Мне нравится" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded" id="ratingButton" onclick="likeArticle()">
+                            @if (isLiked)
+                            {
                                 <i class="bi bi-star-fill me-1" id="ratingStar"></i>
-                                <span id="rating">@Model.rating</span>
-                            </button>
-                        }
-                        else
-                        {
-                            <button type="button" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded" id="ratingButton" onclick="likeArticle(@Model.id)">
+                            }
+                            else
+                            {
                                 <i class="bi bi-star me-1" id="ratingStar"></i>
-                                <span id="rating">@Model.rating</span>
-                            </button>
-                        }
+                            }
+                            <span id="rating">@Model.rating</span>
+                        </button>
+
+                        // Закладка
+                        <button type="button" title="Добавить/удалить закладку" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded" id="bookmarkButton" onclick="bookmarkArticle()">
+                            @if (isBookmarked)
+                            {
+                                <i class="bi bi-bookmark-fill" id="bookmarkIcon"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-bookmark" id="bookmarkIcon"></i>
+                            }
+                        </button>
+                        
                     }
                     else
                     {
@@ -81,7 +95,9 @@
                     {
                         <form asp-action="Delete" asp-route-id="@Model.id" method="post">
                             <input type="number" value="@Model.id" name="id" hidden />
-                            <button type="submit" class="btn btn-sm btn-outline-danger py-0 rounded">Удалить статью</button>
+                            <button type="submit" class="badge bg-light-subtle border border-danger-subtle text-danger-emphasis rounded">
+                                <i class="bi bi-trash"></i>
+                            </button>
                         </form>
                     }
                 </div>
@@ -157,20 +173,45 @@
             form.insertBefore(root, form.children[0]);
         }
 
-        function likeArticle(id) {
-            $('#rating').load('/a/' + id + '/like');
-            const btn = document.getElementById("ratingButton");
-            btn.onclick = function() { dislikeArticle( @Model.id ); }
-            const ratingStar = document.getElementById("ratingStar");
-            ratingStar.classList.replace("bi-star", "bi-star-fill");
+        function bookmarkArticle() {
+            const icon = document.getElementById("bookmarkIcon");
+
+            let action;
+
+            if (icon.classList.contains("bi-bookmark")) {
+                action = "Add";
+            }
+
+            else {
+                action = "Delete";
+            }
+
+            $.post(
+                "/Bookmarks/" + action,  // URL, куда отправляется запрос
+                { articleId: @Model.id }  // Данные для отправки (объект)
+            );
+
+            icon.classList.toggle("bi-bookmark");
+            icon.classList.toggle("bi-bookmark-fill");
         }
 
-        function dislikeArticle(id) {
-            $('#rating').load('/a/' + id + '/dislike');
-            const btn = document.getElementById("ratingButton");
+        function likeArticle() {
             const ratingStar = document.getElementById("ratingStar");
-            ratingStar.classList.replace("bi-star-fill", "bi-star");
-            btn.onclick = function() { likeArticle( @Model.id ); }
+
+            let action;
+
+            if (ratingStar.classList.contains("bi-star")) {
+                action = "like";
+            }
+
+            else {
+                action = "dislike";
+            }
+
+            $('#rating').load('/a/@Model.id/' + action);
+
+            ratingStar.classList.toggle("bi-star");
+            ratingStar.classList.toggle("bi-star-fill");
         }
 
         function reverseComments() {

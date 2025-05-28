@@ -1,0 +1,21 @@
+﻿@model IEnumerable<(Article, DateTime)>
+
+@{
+    ViewData["Title"] = "Найденные статьи";
+    IEnumerable<DateTime> bookmarksAddedAt = ViewBag.bookmarksAddedAt;
+}
+
+@if (!Model.Any())
+{
+    <div>Закладок нет</div>
+}
+else
+{
+    <div class="row mb-2">
+        @foreach (var (article, bookmarkAddedAt) in Model)
+        {
+            <span class="text-muted small">@bookmarkAddedAt.ToString("f")</span>
+            <partial name="_ArticleExcerptBig" model="@article" />
+        }
+    </div>
+}

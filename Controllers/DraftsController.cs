@@ -193,26 +193,4 @@ public class DraftsController : Controller
 
         return RedirectToAction("Index", "Article", new { id = articleId });
     }
-
-    [NonAction]
-    private string getMDExcerpt(string articleMDContent, int maxLines)
-    {
-        string[] lines = articleMDContent.Split('\n');
-
-        int lineCount = lines.Length;
-
-        string excerpt;
-
-        if (lineCount > maxLines)
-        {
-            excerpt = String.Join("\n", lines.Take(4).Append("…"));
-        }
-
-        else
-        {
-            excerpt = articleMDContent;
-        }
-
-        return excerpt;
-    }
 }
