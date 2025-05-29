@@ -17,6 +17,8 @@
         isLiked = _likes.Get(User.Identity.Name, Model.id) != null;
         isBookmarked = _bookmars.Get(User.Identity.Name, Model.id) != null;
     }
+
+    IEnumerable<Article> recommendations = ViewBag.recommendations;
 }
 
 <!-- Статья -->
@@ -95,7 +97,7 @@
                     {
                         <form asp-action="Delete" asp-route-id="@Model.id" method="post">
                             <input type="number" value="@Model.id" name="id" hidden />
-                            <button type="submit" class="badge bg-light-subtle border border-danger-subtle text-danger-emphasis rounded">
+                            <button type="submit" title="Удалить статью" class="badge bg-light-subtle border border-danger-subtle text-danger-emphasis rounded">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </form>
@@ -106,9 +108,24 @@
     </div>
 </div>
 
+@if (recommendations.Any())
+{
+    <div class="pb-4">
+        <h5 class="mt-3 mb-3">Смотрите также</h5>
+        <div class="row">
+            @foreach (Article article in recommendations)
+            {
+                <div class="col-md-4">
+                    <partial name="_ArticleCard" model="@article" />
+                </div>
+            }
+        </div>
+    </div>
+}
+
 <!-- Секция комментариев -->
-<div class="border-top pt-4">
-    <h5 class="mb-2 fw-normal">Комментарии</h5>
+<div class="border-top">
+    <h5 class="mt-3 mb-3">Комментарии</h5>
     
     @if (Model.comments.Any())
     {
@@ -123,12 +140,12 @@
         </div>
     }
 
-    <div id="comments"></div>
+    <div id="comments" class="mb-4"></div>
 
     @if (User.Identity.IsAuthenticated)
     {
         <!-- Форма добавления комментария -->
-        <h6 class="mb-3 mt-3 fw-normal">Добавить комментарий</h6>
+        <h6 class="mb-3 mt-3">Добавить комментарий</h6>
         <form asp-action="AddComment" asp-route-articleId="@Model.id" method="post" id="addCommentForm">
             <div class="d-flex flex-column mb-3 gap-1">
                 <textarea class="form-control" rows="3" placeholder="Ваш комментарий..." name="text"></textarea>
@@ -266,7 +283,9 @@
                 comment.classList.add("comment", "pt-2");
 
                 comment.innerHTML = `<div class="comment-header d-flex small text-muted gap-2">
-                    <a class="page-link" href="/u/${login_Users}">@@${login_Users}</a>
+                    <a class="page-link" href="/u/${login_Users}">
+                        <i class="bi bi-person"></i>${login_Users}
+                    </a>
                     <span class="fw-light">${published_atStr}</span>
                 </div>`;
 

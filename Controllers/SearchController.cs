@@ -35,7 +35,7 @@ public class SearchController : Controller
             splittedTags = Regex.Split(tags, @"\s*,\s*");
         }
 
-        var model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc);
+        List<Article> model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc).ToList();
 
         PagingInfo p = new PagingInfo()
         {

@@ -43,16 +43,20 @@
                 <h4 class="column-header">Самые новые</h4>
             </div>
 
-            <div class="row mb-2">
+            <div class="row">
                 @foreach (Article article in lastArticles.Take(2))
                 {
-                    <partial name="_ArticleExcerptBig" model="@article" />
+                    <div class="col-md-6 mb-4">
+                        <partial name="_ArticleCard" model="@article" />
+                    </div>
                 }
             </div>
-            <div class="row mb-2">
+            <div class="row">
                 @foreach (Article article in lastArticles.Skip(2).Take(3))
                 {
-                    <partial name="_ArticleExcerptSmall" model="@article" />
+                    <div class="col-md-4 mb-4">
+                        <partial name="_ArticleCard" model="@article" />
+                    </div>
                 }
             </div>
 
@@ -72,16 +76,20 @@
                 <h4 class="column-header">Самые популярные</h4>
             </div>
 
-            <div class="row mb-2">
+            <div class="row">
                 @foreach (Article article in popularArticles.Take(2))
                 {
-                    <partial name="_ArticleExcerptBig" model="@article" />
+                    <div class="col-md-6 mb-4">
+                        <partial name="_ArticleCard" model="@article" />
+                    </div>
                 }
             </div>
-            <div class="row mb-2">
+            <div class="row">
                 @foreach (Article article in popularArticles.Skip(2).Take(3))
                 {
-                    <partial name="_ArticleExcerptSmall" model="@article" />
+                    <div class="col-md-4 mb-4">
+                        <partial name="_ArticleCard" model="@article" />
+                    </div>
                 }
             </div>
 

@@ -100,8 +100,7 @@ public class UserController : Controller
 
         model = model
             .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
-            .Take(p.ItemsPerPage)
-            .ToList();
+            .Take(p.ItemsPerPage);
 
 
         ViewBag.username = username;

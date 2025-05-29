@@ -22,13 +22,23 @@
     </div>
 </nav>
 
-<partial name="_ArticleSort" />
+@if (!Model.Any())
+{
+    <div>У пользователя нет ни одной статьи</div>
+}
 
-<div class="row mb-2">
-    @foreach (Article article in Model)
-    {
-        <partial name="_ArticleExcerptBig" model="@article" />
-    }
-</div>
+else
+{
+    <partial name="_ArticleSort" />
 
-<partial name="_Pagination" model="@ViewBag.PageInfo" />
+    <div class="row">
+        @foreach (Article article in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <partial name="_ArticleCard" model="@article" />
+            </div>
+        }
+    </div>
+
+    <partial name="_Pagination" model="@ViewBag.PageInfo" />
+}

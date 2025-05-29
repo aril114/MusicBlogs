@@ -1,41 +1,53 @@
-﻿@{
+﻿@model List<Article>
+
+@{
     ViewData["Title"] = "Найденные статьи";
 }
 
-<div class="row mb-2">
-    @foreach (Article article in Model)
-    {
-        <partial name="_ArticleExcerptBig" model="@article" />
-    }
-</div>
+@if (!Model.Any())
+{
+    <div>Статей по вашему запросу не найдено</div>
+}
 
-<!-- Пагинация -->
-<tfoot>
-    <tr>
-        <td colspan="5">
-            Страница:
-            <div class="btn-group pull-right m-1">
-                @{
-                    PagingInfo p = ViewBag.PageInfo;
-                    for (int e = 1; e <= p.TotalPages; e++)
-                    {
-                        if (e == p.CurrentPage)
+else
+{
+    <div class="row">
+        @foreach (Article article in Model)
+        {
+            <div class="col-md-4 mb-4">
+                <partial name="_ArticleCard" model="@article" />
+            </div>
+        }
+    </div>
+
+    <!-- Пагинация -->
+    <tfoot>
+        <tr>
+            <td colspan="5">
+                Страница:
+                <div class="btn-group pull-right m-1">
+                    @{
+                        PagingInfo p = ViewBag.PageInfo;
+                        for (int e = 1; e <= p.TotalPages; e++)
                         {
-                            <a class="btn-primary btn btn-sm disabled">@e</a>
-                        }
-                        else
-                        {
-                            <a class="btn-outline-primary btn btn-sm"
-                               asp-route-page="@e"
-                               asp-route-query="@ViewBag.query"
-                               asp-route-tags="@ViewBag.tags"
-                               asp-route-searchIn="@ViewBag.searchIn"
-                               asp-route-sortBy="@ViewBag.sortBy"
-                               asp-route-ascDesc="@ViewBag.ascDesc">@e</a>
+                            if (e == p.CurrentPage)
+                            {
+                                <a class="btn-primary btn btn-sm disabled">@e</a>
+                            }
+                            else
+                            {
+                                <a class="btn-outline-primary btn btn-sm"
+                                   asp-route-page="@e"
+                                   asp-route-query="@ViewBag.query"
+                                   asp-route-tags="@ViewBag.tags"
+                                   asp-route-searchIn="@ViewBag.searchIn"
+                                   asp-route-sortBy="@ViewBag.sortBy"
+                                   asp-route-ascDesc="@ViewBag.ascDesc">@e</a>
+                            }
                         }
                     }
-                }
-            </div>
-        </td>
-    </tr>
-</tfoot>
+                </div>
+            </td>
+        </tr>
+    </tfoot>
+}

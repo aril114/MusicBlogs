@@ -24,16 +24,16 @@
         <input type="text" class="form-control" name="tags" value="@Model.tags" placeholder="Теги, разделенные запятой" />
     </div>
     <div class="mb-2">
-        <label for="tags" class="h-6">Вырезка из статьи</label>
-        <input type="text" class="form-control" name="excerpt" value="@Model.excerpt" placeholder="Вырезка" />
+        <label for="excerpt" class="h-6">Вырезка из статьи</label>
+        <textarea type="text" class="form-control" name="excerpt" placeholder="Вырезка">@Model.excerpt</textarea>
     </div>
     <div class="mb-2">
-        <label for="tags" class="h-6">Изображение-превью для статьи</label>
+        <label for="previewImg" class="h-6">Изображение-превью для статьи</label>
         <input type="text" class="form-control" name="previewImg" value="@Model.preview_img" placeholder="URL изображения" />
     </div>
     <label for="text" class="h-6">Содержание</label>
     <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
-    <textarea id="txtArea" name="text">@Model.content</textarea>
+    <textarea id="contentArea" name="text">@Model.content</textarea>
 </form>
 
 <form asp-action="Delete" id="deleteForm" method="post"></form>
@@ -45,7 +45,7 @@
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
     const easyMDE = new EasyMDE({
         spellChecker: false,
-        element: document.getElementById('txtArea')
+        element: document.getElementById('contentArea')
     });
     
     // Не отправлять форму, если в содержании статьи либо

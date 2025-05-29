@@ -43,6 +43,32 @@ public class ArticleController : Controller
 
         string[] tags = dbTags.Select(t => t.name).ToArray();
 
+        int recommendedCount = 3;
+
+        List<Article> recommendations = new List<Article>();
+        HashSet<int> rIds = new HashSet<int>();
+        rIds.Add(id);
+
+        foreach (string tag in tags)
+        {
+            var tagArticles = _articles.Search(query: null, tags: [tag]);
+
+            foreach (Article tagArticle in tagArticles)
+            {
+                if (!rIds.Contains(tagArticle.id))
+                {
+                    rIds.Add(tagArticle.id);
+                    recommendations.Add(tagArticle);
+
+                    if (recommendations.Count >= recommendedCount) break;
+                }
+            }
+
+            if (recommendations.Count() >= recommendedCount) break;
+        }
+
+        ViewBag.recommendations = recommendations;
+
         var model = new ArticleViewModel(
             article.id,
             article.published_at,
