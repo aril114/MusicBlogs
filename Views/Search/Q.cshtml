@@ -1,4 +1,4 @@
-﻿@model List<Article>
+﻿@model IEnumerable<Article>
 
 @{
     ViewData["Title"] = "Найденные статьи";
@@ -11,14 +11,24 @@
 
 else
 {
+    if (!string.IsNullOrWhiteSpace(ViewBag.query) && !ViewBag.searchInTitle)
+    {
+        <div>
+            Запрос @ViewBag.query был найден в тексте следующих статей:
+        </div>
+    }
+
     <div class="row">
         @foreach (Article article in Model)
         {
             <div class="col-md-4 mb-4">
+                @* Маленькая карточка col-md-4, большая col-md-6 *@
                 <partial name="_ArticleCard" model="@article" />
             </div>
         }
     </div>
+
+    <div id="query" hidden>@ViewBag.query</div>
 
     <!-- Пагинация -->
     <tfoot>
@@ -50,4 +60,18 @@ else
             </td>
         </tr>
     </tfoot>
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.query) && ViewBag.searchInTitle)
+    {
+        @section Scripts{
+            <script src="~/lib/mark.js/jquery.mark.min.js"></script>
+            <script type="text/javascript">
+                $(document).ready(function () {
+                    const query = document.getElementById("query").innerText;
+
+                    $(".card-title").mark(query);
+                });
+            </script>
+        }
+    }
 }

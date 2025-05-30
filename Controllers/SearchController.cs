@@ -35,7 +35,7 @@ public class SearchController : Controller
             splittedTags = Regex.Split(tags, @"\s*,\s*");
         }
 
-        List<Article> model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc).ToList();
+        IEnumerable<Article> model = _articles.Search(query, splittedTags, searchInTitle, sortByDate, desc);
 
         PagingInfo p = new PagingInfo()
         {
@@ -53,10 +53,11 @@ public class SearchController : Controller
         ViewBag.sortBy = sortBy;
         ViewBag.ascDesc = ascDesc;
 
+        ViewBag.searchInTitle = searchInTitle;
+
         model = model
             .Skip(p.ItemsPerPage * (p.CurrentPage - 1))
-            .Take(p.ItemsPerPage)
-            .ToList();
+            .Take(p.ItemsPerPage);
 
         return View(model);
     }
