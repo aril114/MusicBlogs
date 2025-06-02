@@ -1,10 +1,15 @@
 {
   "version": "3.0",
   "defaultProvider": "cdnjs",
-  "libraries": [{
-  "provider": "cdnjs",
-  "library": "mark.js@8.11.1",
-  "destination": "wwwroot/lib/mark.js/"
-}
-]
+  "libraries": [
+    {
+      "library": "mark.js@8.11.1",
+      "destination": "wwwroot/lib/mark.js/"
+    },
+    {
+      "provider": "unpkg",
+      "library": "easymde@2.20.0",
+      "destination": "wwwroot/lib/easymde/"
+    }
+  ]
 }
