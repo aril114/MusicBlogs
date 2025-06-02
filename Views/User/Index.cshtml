@@ -29,27 +29,48 @@
     </div>
 </nav>
 
-<b>Имя пользователя:</b>
+<div class="fw-semibold">Имя пользователя:</div>
 <div>@Model.login</div>
-<b>Зарегистрирован:</b>
+<div class="fw-semibold">Зарегистрирован:</div>
 <div>@Model.created_at.ToString("f")</div>
-@if (Model.about != null)
+
+@if (User.Identity.Name == Model.login)
 {
-    <b>О себе:</b>
+    <label for="aboutInfo" class="form-label fw-semibold">О себе:</label>
+    <form asp-action="EditAboutInfo" class="mb-2">
+        <textarea class="form-control mb-2" placeholder="Расскажите о себе" id="aboutInfo" name="aboutInfo">@Model.about</textarea>
+        <button class="btn btn-primary" type="submit">Изменить</button>
+    </form>
+}
+
+else if (Model.about != null)
+{
+    <div class="fw-semibold">О себе:</div>
     <div>@Model.about</div>
 }
-@if (Model.contacts != null)
+
+@if (User.Identity.Name == Model.login)
 {
-    <b>Контакты:</b>
+    <label for="contacts" class="form-label fw-semibold">Контакты:</label>
+    <form asp-action="EditContacts" class="mb-2">
+        <textarea class="form-control mb-2" placeholder="Как с вами можно связаться?" id="contacts" name="contacts">@Model.contacts</textarea>
+        <button class="btn btn-primary" type="submit">Изменить</button>
+    </form>
+}
+
+else if (Model.contacts != null)
+{
+    <div class="fw-semibold">Контакты:</div>
     <div>@Model.contacts</div>
 }
+
 @if (Model.is_moderator)
 {
-    <b style="color: forestgreen">Модератор</b>
+    <div class="fw-semibold" style="color: forestgreen">Модератор</div>
 }
 else
 {
-    <b>Обычный пользователь</b>
+    <div class="fw-semibold">Обычный пользователь</div>
 }
 @if (Model.is_banned)
 {

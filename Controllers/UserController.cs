@@ -112,6 +112,28 @@ public class UserController : Controller
 
     [Authorize]
     [HttpPost]
+    public ActionResult EditAboutInfo(string aboutInfo)
+    {
+        var user = _users.Get(User.Identity.Name) with { about = aboutInfo };
+
+        _users.Update(user);
+
+        return Ok("Информация о себе изменена");
+    }
+
+    [Authorize]
+    [HttpPost]
+    public ActionResult EditContacts(string contacts)
+    {
+        var user = _users.Get(User.Identity.Name) with { contacts = contacts };
+
+        _users.Update(user);
+
+        return Ok("Контакты изменены");
+    }
+
+    [Authorize]
+    [HttpPost]
     public ActionResult Ban(string username, string reason)
     {
         var userBanning = _users.Get(User.Identity.Name);

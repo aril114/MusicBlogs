@@ -62,7 +62,7 @@ public class DapperUserData : IUserData
             var sqlQuery = """
                 UPDATE "Users"
                 SET created_at = @created_at, contacts = @contacts, about = @about,
-                pasword = @pasword, is_moderator = @is_moderator, is_banned = @is_banned, ban_reason = @ban_reason
+                password = @password, is_moderator = @is_moderator, is_banned = @is_banned, ban_reason = @ban_reason
                 WHERE login = @login
                 """;
             db.Execute(sqlQuery, user);

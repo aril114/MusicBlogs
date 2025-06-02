@@ -15,23 +15,23 @@
 
 <form method="post" id="editForm">
     <div class="mb-2">
-        <label for="title" class="h-6">Заголовок</label>
+        <label for="title">Заголовок</label>
         <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
         <input type="text" class="form-control" name="title" value="@Model.title" placeholder="Как будет называться ваша статья?" required />
     </div>
     <div class="mb-2">
-        <label for="tags" class="h-6">Теги</label>
+        <label for="tags">Теги</label>
         <input type="text" class="form-control" name="tags" value="@Model.tags" placeholder="Теги, разделенные запятой" />
     </div>
     <div class="mb-2">
-        <label for="excerpt" class="h-6">Вырезка из статьи</label>
+        <label for="excerpt">Вырезка из статьи</label>
         <textarea type="text" class="form-control" name="excerpt" placeholder="Вырезка">@Model.excerpt</textarea>
     </div>
     <div class="mb-2">
-        <label for="previewImg" class="h-6">Изображение-превью для статьи</label>
+        <label for="previewImg">Изображение-превью для статьи</label>
         <input type="text" class="form-control" name="previewImg" value="@Model.preview_img" placeholder="URL изображения" />
     </div>
-    <label for="text" class="h-6">Содержание</label>
+    <label for="text">Содержание</label>
     <span style="color: red" data-bs-toggle="tooltip" data-bs-title="Обязательное для заполнения поле">*</span>
     <textarea id="contentArea" name="text">@Model.content</textarea>
 </form>
