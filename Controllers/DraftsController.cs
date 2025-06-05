@@ -24,20 +24,37 @@ public class DraftsController : Controller
         _userData = userData;
     }
 
-    // GET: MyArticlesController
     public ActionResult Index()
     {
-        var model = _draftArticleData.GetAllForUser(User.Identity.Name);
+        var model = _draftArticleData.GetAllForUser(User.Identity.Name, false);
         return View(model);
     }
 
-    // GET: MyArticlesController/Create
+    public ActionResult MyPendingModeration()
+    {
+        var model = _draftArticleData.GetAllForUser(User.Identity.Name, true);
+        return View(model);
+    }
+
+    public ActionResult ModerateArticles()
+    {
+        var username = User.Identity.Name;
+
+        if (!_userData.Get(username).is_moderator)
+        {
+            return Unauthorized();
+        }
+
+        var model = _draftArticleData.GetAllBeingModerated();
+
+        return View(model);
+    }
+
     public ActionResult Create()
     {
         return View();
     }
 
-    // POST: MyArticlesController/Create
     [HttpPost]
     [ValidateAntiForgeryToken]
     public ActionResult Create(string title, string text, string tags, string excerpt, string preview_img)
@@ -46,23 +63,67 @@ public class DraftsController : Controller
         return RedirectToAction("Index");
     }
 
-    // GET: MyArticlesController/Edit/5
-    public ActionResult Edit(int id)
+    public ActionResult Edit(int id, string? author = null)
     {
-        var model = _draftArticleData.Get(id, User.Identity.Name);
+        author ??= User.Identity.Name;
+
+        var model = _draftArticleData.Get(id, author);
+
+        if (author != User.Identity.Name)
+        {
+            var user = _userData.Get(User.Identity.Name);
+
+            if (!user.is_moderator)
+            {
+                return Unauthorized();
+            }
+
+            if (model == null || !model.is_being_moderated)
+            {
+                return BadRequest();
+            }
+        }
+
+        else
+        {
+            if (model == null)
+            {
+                return NotFound();
+            }
+        }
+
         return View(model);
     }
 
-    // POST: MyArticlesController/Edit/5
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Edit(int id, string title, string text, string tags, string excerpt, string previewImg)
+    public ActionResult Edit(int id, string? author, string title, string text, string tags, string excerpt, string previewImg)
     {
-        var oldDraft = _draftArticleData.Get(id, User.Identity.Name);
+        author ??= User.Identity.Name;
 
-        if (oldDraft == null)
+        var oldDraft = _draftArticleData.Get(id, author);
+
+        if (author != User.Identity.Name)
         {
-            return BadRequest();
+            var user = _userData.Get(User.Identity.Name);
+
+            if (!user.is_moderator)
+            {
+                return Unauthorized();
+            }
+
+            if (oldDraft == null || !oldDraft.is_being_moderated)
+            {
+                return BadRequest();
+            }
+        }
+
+        else
+        {
+            if (oldDraft == null)
+            {
+                return NotFound();
+            }
         }
 
         var newDraft = oldDraft with { title = title, content = text, tags = tags, excerpt = excerpt, preview_img = previewImg };
@@ -88,86 +149,103 @@ public class DraftsController : Controller
         return Ok("Черновик удален");
     }
 
-    // Публикует статью. Использует для создания новой
-    // статьи данные формы, а не данные черновика из БД
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult Publish(int? id, string title, string text, string tags, string excerpt, string previewImg)
+    public ActionResult SendToModeration(int id)
     {
-        var userPublishing = _userData.Get(User.Identity.Name);
+        var authorLogin = User.Identity.Name;
 
-        if (userPublishing.is_banned)
-        {
-            return Unauthorized($"Вы забанены. Причина бана: {userPublishing.ban_reason}");
-        }
-
-        var mdPipeline = new MarkdownPipelineBuilder()
-            .UseBootstrap()
-            .UseSoftlineBreakAsHardlineBreak()
-            .UseAdvancedExtensions()
-            .Build();
-
-        string htmledContent = Markdown.ToHtml(text, mdPipeline);
-
-        DraftArticle? draft = null;
-
-        // Публикуется черновик, для которого в БД уже есть запись
-        if (id != null)
-        {
-            draft = _draftArticleData.Get(id.Value, User.Identity.Name);
-
-            if (draft == null)
-            {
-                return BadRequest();
-            }
-        }
-
-        // Либо создается новая статья, которая и публикуется
-        int articleId = _articleData.Add(htmledContent, title, excerpt, previewImg, User.Identity.Name);
-
-        // Удаление черновика, если публикуется он
-        if (draft != null)
-        {
-            _draftArticleData.Delete(draft);
-        }
-
-        // Добавление тегов
-        if (!string.IsNullOrWhiteSpace(tags))
-        {
-            string[] splittedTags = Regex.Split(tags, @"\s*,\s*");
-
-            foreach (string tag in splittedTags)
-            {
-                _tagData.Add(tag, articleId);
-            }
-        }
-
-        return RedirectToAction("Index", "Article", new { id = articleId });
-    }
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public ActionResult PublishById(int id)
-    {
-        var userPublishing = _userData.Get(User.Identity.Name);
-
-        if (userPublishing.is_banned)
-        {
-            return Unauthorized($"Вы забанены. Причина бана: {userPublishing.ban_reason}");
-        }
-
-        var mdPipeline = new MarkdownPipelineBuilder()
-            .UseBootstrap()
-            .UseSoftlineBreakAsHardlineBreak()
-            .UseAdvancedExtensions()
-            .Build();
-
-        var draft = _draftArticleData.Get(id, User.Identity.Name);
+        DraftArticle draft = _draftArticleData.Get(id, authorLogin);
 
         if (draft == null)
         {
             return BadRequest();
         }
+
+        if (draft.is_being_moderated)
+        {
+            return BadRequest("Статья уже ожидает публикации");
+        }
+
+        _draftArticleData.Update(draft with { is_being_moderated = true });
+
+        return Ok("Статья отправлена на публикацию");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult SendBackToAuthor(int id, string author)
+    {
+        var userSending = _userData.Get(User.Identity.Name);
+
+        if (!userSending.is_moderator)
+        {
+            return Unauthorized();
+        }
+
+        var draft = _draftArticleData.Get(id, author);
+
+        if (draft == null || !draft.is_being_moderated)
+        {
+            return BadRequest();
+        }
+
+        _draftArticleData.Update(draft with { is_being_moderated = false });
+
+        return Ok("Черновик отправлен обратно автору");
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult PublishNotExisting(string title, string text, string tags, string excerpt, string preview_img)
+    {
+        int id = _draftArticleData.Add(text, title, tags, excerpt, preview_img, User.Identity.Name);
+
+        var userPublishing = _userData.Get(User.Identity.Name);
+
+        if (userPublishing.is_moderator)
+        {
+            return Publish(id);
+        }
+
+        return SendToModeration(id);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public ActionResult Publish(int id, string? author = null)
+    {
+        var userPublishing = _userData.Get(User.Identity.Name);
+
+        if (userPublishing.is_banned)
+        {
+            return Unauthorized($"Вы забанены. Причина бана: {userPublishing.ban_reason}");
+        }
+
+        if (!userPublishing.is_moderator)
+        {
+            return Unauthorized("Опубликовать статью может только модератор");
+        }
+
+        author ??= User.Identity.Name;
+
+        var draft = _draftArticleData.Get(id, author);
+
+        if (draft == null)
+        {
+            return BadRequest("Черновик статьи не найден");
+        }
+
+        if (userPublishing.login != author && !draft.is_being_moderated)
+        {
+            return BadRequest("Нельзя опубликовать статью, которая не была отправлена на модерацию.");
+        }
+
+        var mdPipeline = new MarkdownPipelineBuilder()
+            .UseBootstrap()
+            .UseSoftlineBreakAsHardlineBreak()
+            .UseAdvancedExtensions()
+            .Build();
 
         string excerpt = draft.excerpt;
 
@@ -176,7 +254,7 @@ public class DraftsController : Controller
         string htmledContent = Markdown.ToHtml(draft.content, mdPipeline);
 
         // Добавление статьи в БД
-        int articleId = _articleData.Add(htmledContent, draft.title, excerpt, previewImg, User.Identity.Name);
+        int articleId = _articleData.Add(htmledContent, draft.title, excerpt, previewImg, draft.login_Users);
 
         // Теги
         if (!string.IsNullOrWhiteSpace(draft.tags))

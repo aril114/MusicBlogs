@@ -1,0 +1,57 @@
+﻿@model IEnumerable<DraftArticle>
+
+@{
+    ViewData["title"] = "Ожидающие публикации";
+}
+
+<nav class="navbar navbar-expand rounded">
+    <div class="navbar-collapse justify-content-md-center">
+        <ul class="navbar-nav gap-3">
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index">Неопубликованные</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" asp-action="MyPendingModeration">Ожидают публикации</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+@if (!Model.Any())
+{
+    <div>Нет статей, ожидающих публикации</div>
+}
+
+else
+{
+    <div class="drafts d-flex flex-column gap-3">
+    @foreach (DraftArticle draft in Model)
+    {
+            <div class="col-md-4">
+                <div class="card article-card">
+                    <div style="font-size: 0.8rem" class="d-flex gap-3 m-1 ms-3">
+                        <div>
+                            <a class="page-link fw-semibold" asp-controller="User" asp-action="Index" asp-route-username="@draft.login_Users">
+                                <i class="bi bi-person"></i>@draft.login_Users
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-title page-link ms-3 me-3" title="@draft.title">@draft.title</div>
+                    @if (draft.preview_img != null)
+                    {
+                        <img src="@draft.preview_img" class="preview-img" alt="Превью к статье">
+                        <div class="card-body">
+                            <p class="card-text">@draft.excerpt</p>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="card-body pt-0">
+                            <p class="card-text">@draft.excerpt</p>
+                        </div>
+                    }
+                </div>
+            </div>
+    }
+    </div>
+}

@@ -15,7 +15,7 @@ else
         @foreach (var (article, bookmarkAddedAt) in Model)
         {
             <div class="col-md-4 mb-4">
-                <span class="text-muted small">@bookmarkAddedAt.ToString("f")</span>
+                <span class="text-muted small">Закладка от @bookmarkAddedAt.ToString("f")</span>
                 <partial name="_ArticleCard" model="@article" />
             </div>
         }

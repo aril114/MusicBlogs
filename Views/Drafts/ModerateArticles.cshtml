@@ -1,0 +1,22 @@
+﻿@model IEnumerable<DraftArticle>
+
+@{
+    ViewData["title"] = "Модерация статей";
+}
+
+@if (!Model.Any())
+{
+    <div>Нет статей, отправленных на модерацию</div>
+}
+
+else
+{
+    <div class="row">
+    @foreach (DraftArticle draft in Model)
+    {
+        <div class="col-md-4">
+            <partial name="_DraftCard" model="@draft" />
+        </div>
+    }
+    </div>
+}

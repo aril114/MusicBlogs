@@ -12,20 +12,18 @@
 }
 
 <nav class="navbar navbar-expand rounded">
-    <div class="container-fluid">
-        <div class="collapse navbar-collapse justify-content-md-center" id="navbarsExample10">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" asp-action="Index" asp-route-username="@username">О пользователе</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="Articles" asp-route-username="@username">Статьи</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" asp-action="Comments" asp-route-username="@username">Комментарии</a>
-                </li>
-            </ul>
-        </div>
+    <div class="collapse navbar-collapse justify-content-md-center">
+        <ul class="navbar-nav gap-3">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" asp-action="Index" asp-route-username="@username">О пользователе</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Articles" asp-route-username="@username">Статьи</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Comments" asp-route-username="@username">Комментарии</a>
+            </li>
+        </ul>
     </div>
 </nav>
 

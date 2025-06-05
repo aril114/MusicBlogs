@@ -17,24 +17,25 @@ public class DapperDraftArticleData : IDraftArticleData
         _cn = configuration.GetSection("ConnectionStrings")["DefaultConnection"];
     }
 
-    public void Add(string content, string title, string tags, string excerpt, string preview_img, string login_Users)
+    public int Add(string content, string title, string tags, string excerpt, string preview_img, string login_Users)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
                 INSERT INTO "DraftArticles" (content, title, tags, excerpt, preview_img, "login_Users") VALUES
                 (@content, @title, @tags, @excerpt, @preview_img, @login_Users)
+                RETURNING id
                 """;
-            db.Execute(sqlQuery, new { content, title, tags, excerpt, preview_img, login_Users });
+            return db.Query<int>(sqlQuery, new { content, title, tags, excerpt, preview_img, login_Users }).First();
         }
     }
 
-    public void Delete(DraftArticle DraftArticle)
+    public void Delete(DraftArticle draftArticle)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = "DELETE FROM \"DraftArticles\" WHERE id = @id and \"login_Users\"=@login_Users";
-            db.Execute(sqlQuery, DraftArticle);
+            db.Execute(sqlQuery, draftArticle);
         }
     }
 
@@ -49,39 +50,40 @@ public class DapperDraftArticleData : IDraftArticleData
         }
     }
 
-    public IEnumerable<DraftArticle> GetAll()
+    public IEnumerable<DraftArticle> GetAllBeingModerated()
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<DraftArticle>("""
                 SELECT * FROM "DraftArticles"
+                WHERE "is_being_moderated" = true
                 """).ToList();
-                
         }
     }
 
-    public IEnumerable<DraftArticle> GetAllForUser(string userLogin)
+    public IEnumerable<DraftArticle> GetAllForUser(string userLogin, bool is_being_moderated = false)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             return db.Query<DraftArticle>("""
                 SELECT * FROM "DraftArticles"
                 WHERE "login_Users" = @userLogin
+                AND "is_being_moderated" = @is_being_moderated
                 ORDER BY id DESC
-                """, new { userLogin }).ToList();
+                """, new { userLogin, is_being_moderated }).ToList();
         }
     }
 
-    public void Update(DraftArticle DraftArticle)
+    public void Update(DraftArticle draftArticle)
     {
         using (IDbConnection db = new NpgsqlConnection(_cn))
         {
             var sqlQuery = """
                 UPDATE "DraftArticles"
-                SET content = @content, title = @title, tags = @tags, excerpt = @excerpt, preview_img = @preview_img
+                SET content = @content, title = @title, tags = @tags, excerpt = @excerpt, preview_img = @preview_img, is_being_moderated = @is_being_moderated
                 WHERE id = @id AND "login_Users" = @login_Users
                 """;
-            db.Execute(sqlQuery, DraftArticle);
+            db.Execute(sqlQuery, draftArticle);
         }
     }
 }

@@ -112,17 +112,21 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
+.sidebar .nav-link {
+    color: rgba(0,0,0, 0.65);
+}
+
+.sidebar .nav-link:hover, .sidebar .nav-link.active {
+    color: rgba(0,0,0, 0.8);
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+
 .nav-link {
-    color: #495057;
     border-radius: 8px;
     padding: 8px 12px;
     margin-bottom: 4px;
     transition: all 0.2s ease;
-}
-
-.nav-link:hover, .nav-link.active {
-    color: var(--primary-color);
-    background-color: rgba(67, 97, 238, 0.1);
 }
 
 .tag-btn {

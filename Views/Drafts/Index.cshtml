@@ -1,8 +1,35 @@
 ﻿@model IEnumerable<DraftArticle>
 
+@inject MusicBlogs.Services.IUserData _users;
+
 @{
     ViewData["title"] = "Черновики";
+
+    string username = User.Identity.Name;
+    bool isModerator = _users.Get(username).is_moderator;
 }
+
+<nav class="navbar navbar-expand rounded">
+    <div class="navbar-collapse justify-content-md-center">
+        <ul class="navbar-nav gap-3">
+            <li class="nav-item">
+                <a class="nav-link active" asp-action="Index">Неопубликованные</a>
+            </li>
+            @if (isModerator)
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="ModerateArticles">Требуют проверки</a>
+                </li>
+            }
+            else
+            {
+                <li class="nav-item">
+                    <a class="nav-link" asp-action="MyPendingModeration">Ожидают публикации</a>
+                </li>
+            }
+        </ul>
+    </div>
+</nav>
 
 @if (!Model.Any())
 {
@@ -11,67 +38,11 @@
 
 else
 {
-    <div class="drafts d-flex flex-column gap-3">
+    <div class="row">
     @foreach (DraftArticle draft in Model)
     {
-        <!-- Выжимка из черновика -->
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <!-- Контейнер статьи -->
-                    <div class="border rounded-3 p-2 ps-4 bg-white">
-                        <!-- Действия -->
-                        <div class="d-flex small text-muted align-items-center gap-2">
-                            <a class="page-link" asp-action="Edit" asp-route-id="@draft.id">Редактировать</a>
-                            <!-- Button trigger modal -->
-                                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#publishModal_@draft.id">
-                                Опубликовать
-                            </button>
-                                <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal_@draft.id">
-                                Удалить
-                            </button>
-                        </div>
-
-                        <!-- Модальное окно для удаления -->
-                            <div class="modal fade" id="deleteModal_@draft.id" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-body ">
-                                        <p>Вы точно хотите удалить статью?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                                        <form method="post" asp-action="Delete" asp-route-id="@draft.id">
-                                            <button type="submit" class="btn btn-danger">Удалить</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Модальное окно для публикации -->
-                        <div class="modal fade" id="publishModal_@draft.id" tabindex="-1" aria-labelledby="publishModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-body ">
-                                        <p>После публикации статьи ее уже нельзя будет изменить.</p>
-                                        <p>Вы уверены, что хотите опубликовать статью?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
-                                        <form method="post" asp-action="PublishById" asp-route-id="@draft.id">
-                                            <button type="submit" class="btn btn-primary">Опубликовать</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Заголовок -->
-                        <h2 class="mb-3">@draft.title</h2>
-                    </div>
-                </div>
-            </div>
+        <div class="col-md-4">
+            <partial name="_DraftCard" model="@draft" />
         </div>
     }
     </div>
