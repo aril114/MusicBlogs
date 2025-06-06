@@ -71,7 +71,22 @@
                             }
                             <span id="rating">@Model.rating</span>
                         </button>
+                    }
+                    else
+                    {
+                        <span title="Рейтинг" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded">
+                            <i class="bi bi-star me-1" id="ratingStar"></i>
+                            @Model.rating
+                        </span>
+                    }
 
+                    <a class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded link-underline link-underline-opacity-0" title="Комментарии" href="#comments">
+                        <i class="bi bi-chat-left-text me-1"></i>
+                        @Model.comments.Count()
+                    </a>
+
+                    @if (User.Identity.IsAuthenticated)
+                    {
                         // Закладка
                         <button type="button" title="Добавить/удалить закладку" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded" id="bookmarkButton" onclick="bookmarkArticle()">
                             @if (isBookmarked)
@@ -83,14 +98,6 @@
                                 <i class="bi bi-bookmark" id="bookmarkIcon"></i>
                             }
                         </button>
-                        
-                    }
-                    else
-                    {
-                        <span class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded">
-                            <i class="bi bi-star me-1" id="ratingStar"></i>
-                            @Model.rating
-                        </span>
                     }
 
                     @if (isModerator)

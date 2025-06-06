@@ -23,9 +23,14 @@
             <p class="card-text">@Model.excerpt</p>
         </div>
     }
-    <div class="article-meta mb-3 ms-3">
-        <div>
+
+    <div class="d-flex gap-2 align-items-center mb-3 ms-3">
+        <div title="Рейтинг" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded">
             <i class="bi bi-star me-1"></i>@Model.rating
         </div>
+        <a title="Комментарии" class="badge bg-light-subtle border border-light-subtle text-light-emphasis rounded link-underline link-underline-opacity-0"
+            asp-controller="Article" asp-action="Index" asp-route-id="@Model.id" asp-fragment="comments">
+            <i class="bi bi-chat-left-text me-1"></i>@Model.comment_count
+        </a>
     </div>
 </div>

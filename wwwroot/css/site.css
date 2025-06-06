@@ -83,8 +83,6 @@
     font-size: 0.8rem;
     color: #6c757d;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 /* Адаптация для мобильных */
