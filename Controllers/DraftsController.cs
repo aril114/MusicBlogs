@@ -197,9 +197,9 @@ public class DraftsController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public ActionResult PublishNotExisting(string title, string text, string tags, string excerpt, string preview_img)
+    public ActionResult PublishNotExisting(string title, string text, string tags, string excerpt, string previewImg)
     {
-        int id = _draftArticleData.Add(text, title, tags, excerpt, preview_img, User.Identity.Name);
+        int id = _draftArticleData.Add(text, title, tags, excerpt, previewImg, User.Identity.Name);
 
         var userPublishing = _userData.Get(User.Identity.Name);
 

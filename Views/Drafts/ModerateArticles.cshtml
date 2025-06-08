@@ -4,6 +4,19 @@
     ViewData["title"] = "Модерация статей";
 }
 
+<nav class="navbar navbar-expand rounded">
+    <div class="navbar-collapse justify-content-md-center">
+        <ul class="navbar-nav gap-3">
+            <li class="nav-item">
+                <a class="nav-link" asp-action="Index">Неопубликованные</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" asp-action="ModerateArticles">Требуют проверки</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
 @if (!Model.Any())
 {
     <div>Нет статей, отправленных на модерацию</div>
