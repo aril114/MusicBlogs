@@ -10,6 +10,11 @@
       "provider": "unpkg",
       "library": "easymde@2.20.0",
       "destination": "wwwroot/lib/easymde/"
+    },
+    {
+      "provider": "jsdelivr",
+      "library": "bootstrap-icons@1.13.1",
+      "destination": "wwwroot/lib/bootstrap-icons/"
     }
   ]
 }
