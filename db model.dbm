@@ -1,0 +1,542 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+CAUTION: Do not modify this file unless you know what you are doing.
+ Unexpected results may occur if the code is changed deliberately.
+-->
+<dbmodel pgmodeler-ver="1.1.6" use-changelog="false" max-obj-count="8"
+	 last-position="-18,372" last-zoom="0.9" scene-rect="-20,0,1570.8,1076.8"
+	 default-schema="public" default-owner="postgres"
+	 layers="Default layer"
+	 active-layers="0"
+	 layer-name-colors="#000000"
+	 layer-rect-colors="#b4b4b4"
+	 show-layer-names="false" show-layer-rects="false">
+<database name="musicblogs" is-template="false" allow-conns="true">
+</database>
+
+<schema name="public" layers="0" fill-color="#e1e1e1" name-color="#000000" sql-disabled="true">
+</schema>
+
+<table name="Users" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="320" y="40"/>
+	<column name="login" not-null="true">
+		<type name="varchar" length="16"/>
+	</column>
+	<column name="created_at" not-null="true" default-value="localtimestamp">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="contacts">
+		<type name="varchar" length="256"/>
+	</column>
+	<column name="about">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="password" not-null="true">
+		<type name="varchar" length="20"/>
+	</column>
+	<column name="is_moderator">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="is_banned" default-value="false">
+		<type name="boolean" length="0"/>
+	</column>
+	<column name="ban_reason">
+		<type name="varchar" length="0"/>
+	</column>
+	<constraint name="users_pk" type="pk-constr" table="public.&quot;Users&quot;">
+		<columns names="login" ref-type="src-columns"/>
+	</constraint>
+	<initial-data>
+<![CDATA["login";"created_at";"contacts";"about";"password";"is_moderator"
+"abc";"14.04.2025";"contacts text";"about text";"password";"true"
+]]>
+	</initial-data>
+</table>
+
+<table name="DraftArticles" layers="0" collapse-mode="2" max-obj-count="9" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="0" y="360"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="content" not-null="true">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="title" not-null="true">
+		<type name="varchar" length="100"/>
+	</column>
+	<column name="tags">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="excerpt">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="preview_img">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="is_being_moderated" default-value="false">
+		<type name="boolean" length="0"/>
+	</column>
+
+	<customidxs object-type="column">
+		<object name="login_Users" index="7"/>
+	</customidxs>
+	<customidxs object-type="constraint">
+		<object name="DraftArticles_pk" index="0"/>
+		<object name="Users_fk" index="1"/>
+	</customidxs>	<initial-data>
+<![CDATA["id";"content";"title";"login_Users"
+"1";"example draft content";"example draft title";"abc"
+]]>
+	</initial-data>
+</table>
+
+<relationship name="Users_has_many_DraftArticles" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#ffeebe"
+	 src-table="public.&quot;Users&quot;"
+	 dst-table="public.&quot;DraftArticles&quot;"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="0" y="0"/>
+	</label>
+	<constraint name="DraftArticle_pk" type="pk-constr" table="public.&quot;DraftArticles&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<special-pk-cols indexes="0"/>
+</relationship>
+
+<table name="Articles" layers="0" collapse-mode="2" max-obj-count="10" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="500" y="360"/>
+	<column name="id" not-null="true"
+	 identity-type="ALWAYS">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="published_at" not-null="true" default-value="localtimestamp">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="rating" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="content" not-null="true">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="title" not-null="true">
+		<type name="varchar" length="100"/>
+	</column>
+	<column name="excerpt">
+		<type name="varchar" length="0"/>
+		<comment> <![CDATA[Вырезка из статьи, которую пользователь видит в списках статей]]> </comment>
+	</column>
+	<column name="preview_img">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="comment_count" default-value="0">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="Article_pk" type="pk-constr" table="public.&quot;Articles&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="login_Users" index="8"/>
+	</customidxs>
+	<customidxs object-type="constraint">
+		<object name="Users_fk" index="1"/>
+	</customidxs></table>
+
+<table name="Comments" layers="0" collapse-mode="2" max-obj-count="7" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="460" y="700"/>
+	<column name="id" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<column name="content" not-null="true">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="published_at" not-null="true" default-value="localtimestamp">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="answer_to" default-value="NULL">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="no_self_reference" type="ck-constr" table="public.&quot;Comments&quot;">
+			<expression> <![CDATA[answer_to IS NULL OR answer_to != Id]]> </expression>
+	</constraint>
+
+	<customidxs object-type="column">
+		<object name="id_Articles" index="2"/>
+		<object name="login_Users" index="4"/>
+	</customidxs>
+	<customidxs object-type="constraint">
+		<object name="Articles_fk" index="1"/>
+		<object name="Comments_pk" index="3"/>
+		<object name="Users_fk" index="2"/>
+	</customidxs></table>
+
+<relationship name="Articles_has_many_Comments" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#16a42f"
+	 src-table="public.&quot;Articles&quot;"
+	 dst-table="public.&quot;Comments&quot;"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="-4.2727" y="-4.25299"/>
+	</label>
+	<constraint name="Comments_pk" type="pk-constr" table="public.&quot;Comments&quot;">
+		<columns names="id" ref-type="src-columns"/>
+	</constraint>
+	<special-pk-cols indexes="0"/>
+</relationship>
+
+<relationship name="Users_has_many_Comments" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#f01f58"
+	 src-table="public.&quot;Users&quot;"
+	 dst-table="public.&quot;Comments&quot;"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="57.18" y="-4.45299"/>
+	</label>
+</relationship>
+
+<relationship name="Users_has_many_Articles" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#58885a"
+	 src-table="public.&quot;Users&quot;"
+	 dst-table="public.&quot;Articles&quot;"
+	 src-required="true" dst-required="false">
+	<label ref-type="name-label">
+		<position x="2.24229" y="5.54701"/>
+	</label>
+</relationship>
+
+<function name="set_draft_id_for_user"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    SELECT COALESCE(MAX(id), 0) + 1 INTO NEW.id
+    FROM "DraftArticles"
+    WHERE "login_Users" = NEW."login_Users";
+    RETURN NEW;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_draft_article_id" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="false" trunc-event="false"
+	 table="public.&quot;DraftArticles&quot;">
+		<function signature="public.set_draft_id_for_user()"/>
+</trigger>
+
+<function name="set_comment_id_for_article"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    SELECT COALESCE(MAX(id), 0) + 1 INTO NEW.id
+    FROM "Comments"
+    WHERE "id_Articles" = NEW."id_Articles";
+    RETURN NEW;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_comment_id" firing-type="BEFORE" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="false" trunc-event="false"
+	 table="public.&quot;Comments&quot;">
+		<function signature="public.set_comment_id_for_article()"/>
+</trigger>
+
+<table name="Likes" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<position x="840" y="80"/>
+
+	<customidxs object-type="column">
+		<object name="id_Articles" index="1"/>
+		<object name="login_Users" index="0"/>
+	</customidxs>
+	<customidxs object-type="constraint">
+		<object name="Articles_fk" index="2"/>
+		<object name="Likes_pk" index="0"/>
+		<object name="Users_fk" index="1"/>
+	</customidxs></table>
+
+<relationship name="Users_has_many_many_Users_has_many_Articles" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#307d30"
+	 src-table="public.&quot;Users&quot;"
+	 dst-table="public.&quot;Likes&quot;"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+/>
+
+<relationship name="Articles_has_many_many_Users_has_many_Articles" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#307d30"
+	 src-table="public.&quot;Articles&quot;"
+	 dst-table="public.&quot;Likes&quot;"
+	 src-required="true" dst-required="false"
+	 identifier="true"
+>
+	<label ref-type="name-label">
+		<position x="229.26" y="-56.6485"/>
+	</label>
+</relationship>
+
+<table name="Tags" layers="0" collapse-mode="2" max-obj-count="2" z-value="0">
+	<schema name="public"/>
+	<position x="1020" y="420"/>
+	<column name="name" not-null="true">
+		<type name="varchar" length="0"/>
+	</column>
+	<column name="id_Articles" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+	<constraint name="Tags_pk" type="pk-constr" table="public.&quot;Tags&quot;">
+		<columns names="name,id_Articles" ref-type="src-columns"/>
+	</constraint>
+</table>
+
+<function name="update_article_rating_on_like_insert"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    -- Увеличиваем рейтинг статьи на 1 при добавлении лайка
+    UPDATE "Articles"
+    SET rating = rating + 1 
+    WHERE id = NEW."id_Articles";
+    
+    RETURN NEW;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_likes_insert" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="false" trunc-event="false"
+	 table="public.&quot;Likes&quot;">
+		<function signature="public.update_article_rating_on_like_insert()"/>
+</trigger>
+
+<function name="update_article_rating_on_like_delete"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    -- Уменьшаем рейтинг статьи на 1 при удалении лайка
+    UPDATE "Articles"
+    SET rating = rating - 1 
+    WHERE id = OLD."id_Articles";
+    
+    RETURN OLD;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_likes_delete" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="false" del-event="true" upd-event="false" trunc-event="false"
+	 table="public.&quot;Likes&quot;">
+		<function signature="public.update_article_rating_on_like_delete()"/>
+</trigger>
+
+<function name="update_comment_count_after_comment_insert"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    -- Увеличиваем количество комментариев статьи на 1
+    -- при добавлении комментария
+    UPDATE "Articles"
+    SET comment_count = comment_count + 1 
+    WHERE id = NEW."id_Articles";
+    
+    RETURN NEW;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_comment_count_after_comment_insert" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="true" del-event="false" upd-event="false" trunc-event="false"
+	 table="public.&quot;Comments&quot;">
+		<function signature="public.update_comment_count_after_comment_insert()"/>
+</trigger>
+
+<function name="update_comment_count_after_comment_delete"
+		window-func="false"
+		returns-setof="false"
+		behavior-type="CALLED ON NULL INPUT"
+		function-type="VOLATILE"
+		security-type="SECURITY INVOKER"
+		parallel-type="PARALLEL UNSAFE"
+		execution-cost="1"
+		row-amount="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<language name="plpgsql"/>
+	<return-type>
+	<type name="trigger" length="0"/>
+	</return-type>
+	<definition> <![CDATA[BEGIN
+    -- Уменьшаем количество комментариев статьи на 1
+    -- при удалении комментария
+    UPDATE "Articles"
+    SET comment_count = comment_count - 1 
+    WHERE id = OLD."id_Articles";
+    
+    RETURN OLD;
+END;]]> </definition>
+</function>
+
+<trigger name="trg_comment_count_after_comment_delete" firing-type="AFTER" per-line="true" constraint="false"
+	 ins-event="false" del-event="true" upd-event="false" trunc-event="false"
+	 table="public.&quot;Comments&quot;">
+		<function signature="public.update_comment_count_after_comment_delete()"/>
+</trigger>
+
+<table name="Bookmarks" layers="0" collapse-mode="2" max-obj-count="3" z-value="0">
+	<schema name="public"/>
+	<role name="postgres"/>
+	<position x="80" y="720"/>
+	<column name="created_at" not-null="true" default-value="localtimestamp">
+		<type name="timestamp" length="0"/>
+	</column>
+	<column name="id_Articles" not-null="true">
+		<type name="integer" length="0"/>
+	</column>
+
+	<customidxs object-type="column">
+		<object name="login_Users" index="1"/>
+	</customidxs>
+	<customidxs object-type="constraint">
+		<object name="Bookmarks_pk" index="1"/>
+		<object name="Users_fk" index="0"/>
+	</customidxs></table>
+
+<relationship name="Users_has_many_Bookmarks" type="rel1n" layers="0"
+	 src-col-pattern="{sc}_{st}"
+	 pk-pattern="{dt}_pk" uq-pattern="{dt}_uq"
+	 src-fk-pattern="{st}_fk"
+	 custom-color="#1ce13f"
+	 src-table="public.&quot;Users&quot;"
+	 dst-table="public.&quot;Bookmarks&quot;"
+	 src-required="true" dst-required="false">
+	<constraint name="Bookmarks_pk" type="pk-constr" table="public.&quot;Bookmarks&quot;">
+		<columns names="id_Articles" ref-type="src-columns"/>
+	</constraint>
+	<special-pk-cols indexes="0"/>
+</relationship>
+
+<constraint name="Answer_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="NO ACTION" ref-table="public.&quot;Comments&quot;" table="public.&quot;Comments&quot;">
+	<columns names="answer_to,id_Articles" ref-type="src-columns"/>
+	<columns names="id,id_Articles" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="id_Articles_fk" type="fk-constr" comparison-type="MATCH SIMPLE"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.&quot;Articles&quot;" table="public.&quot;Tags&quot;">
+	<columns names="id_Articles" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<constraint name="Articles_fk" type="fk-constr" comparison-type="MATCH FULL"
+	 upd-action="NO ACTION" del-action="CASCADE" ref-table="public.&quot;Articles&quot;" table="public.&quot;Bookmarks&quot;">
+	<columns names="id_Articles" ref-type="src-columns"/>
+	<columns names="id" ref-type="dst-columns"/>
+</constraint>
+
+<relationship name="rel_Tags_Articles" type="relfk" layers="0"
+	 src-table="public.&quot;Tags&quot;"
+	 dst-table="public.&quot;Articles&quot;" reference-fk="id_Articles_fk"
+	 src-required="false" dst-required="false">
+	<label ref-type="name-label">
+		<position x="3.3174" y="4.78504"/>
+	</label>
+</relationship>
+
+<relationship name="&quot;rel_Bookmarks_Articles&quot;" type="relfk" layers="0"
+	 src-table="public.&quot;Bookmarks&quot;"
+	 dst-table="public.&quot;Articles&quot;" reference-fk="Articles_fk"
+	 src-required="false" dst-required="true"/>
+
+<relationship name="rel_Comments_Comments" type="relfk" layers="0"
+	 src-table="public.&quot;Comments&quot;"
+	 dst-table="public.&quot;Comments&quot;" reference-fk="Answer_fk"
+	 src-required="false" dst-required="true">
+	<line>
+		<position x="951.304" y="807.108"/>
+	<position x="951.304" y="667"/>
+	<position x="765.536" y="667"/>
+	</line>
+</relationship>
+
+</dbmodel>
